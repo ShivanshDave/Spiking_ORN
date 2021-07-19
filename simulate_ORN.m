@@ -141,6 +141,11 @@ function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,N,JP)
 		D_IX = cx1 - P.cx2.*IX;  %This has got to go back down in order for oscillations...
 		D_V = (1./P.cap).*(Icng + Icacl + Il);
         
+        % ML Spike
+        
+        
+        %
+        
 		dy = [D_bLR;D_aG;D_cAMP;D_Ca;D_CaCAM;D_CAMK;D_IX;D_V];
     end
 end

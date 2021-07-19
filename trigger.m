@@ -29,7 +29,6 @@ ylabel('Mem. volt. (mV)')
 
 %%
 
-
 function OUT = simulate_pulse_train(tnow,ton,toff,val,varargin)
 %PULSE_TRAIN Generate a train of pulses.
 %   V = PULSE_TRAIN(T,TON,TOFF,VAL) returns a pulse train
