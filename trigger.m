@@ -3,9 +3,9 @@ PULSE.ton = [ 0.2000  2
               0.2000 2];
 PULSE.toff = [1.2000  3 
               1.2000  3];
-PULSE.conc = [0  5
-              2  5];
-PULSE.tspan = 0:0.1:4;
+PULSE.conc = [0  0
+              2  50];
+PULSE.tspan = 0:0.1:10;
 
 %% RUN
 DATA = simulate_ORN(PULSE);
@@ -14,18 +14,28 @@ DATA = simulate_ORN(PULSE);
 figure(1);
 clf
 
-nexttile
-TT = linspace(DATA.T(1),DATA.T(end),100);
-OD = simulate_pulse_train(TT,PULSE.ton,PULSE.toff,PULSE.conc);
-OD = OD(end,:);
-plot(TT,OD,'r-');
-xlabel('Time (sec)')
-ylabel('Conc. (uM)')
+% nexttile
+% TT = linspace(DATA.T(1),DATA.T(end),100);
+% OD = simulate_pulse_train(TT,PULSE.ton,PULSE.toff,PULSE.conc);
+% OD = OD(end,:);
+% plot(TT,OD,'r-');
+% xlabel('Time (sec)')
+% ylabel('Conc. (uM)')
 
 nexttile
 plot(DATA.T,real(DATA.PRED.V))
 xlabel('Time (sec)')
 ylabel('Mem. volt. (mV)')
+
+nexttile
+plot(DATA.T,real(DATA.PRED.nV))
+xlabel('Time (sec)')
+ylabel('Mem. volt. (mV)')
+
+nexttile
+plot(DATA.T,real(DATA.PRED.nK))
+xlabel('Time (sec)')
+ylabel('nK [0:1]')
 
 %%
 
