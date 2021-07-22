@@ -5,7 +5,7 @@ PULSE.toff = [1.2000  3
               1.2000  3];
 PULSE.conc = [0  0
               2  50];
-PULSE.tspan = 0:0.01:4;
+PULSE.tspan = 0:0.001:4;
 
 %% RUN
 DATA = simulate_ORN(PULSE);
@@ -28,7 +28,7 @@ xlabel('Time (sec)')
 ylabel('Mem. volt. (mV)')
 
 nexttile
-plot(DATA.T,real(DATA.PRED.nV))
+plot(DATA.T,real(DATA.PRED.spkV))
 xlabel('Time (sec)')
 ylabel('Mem. volt. (mV)')
 

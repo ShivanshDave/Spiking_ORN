@@ -1,5 +1,5 @@
 function DATA = simulate_ORN(PULSE)
-%% System co-eff
+%% ORN System co-eff
 P = struct('Sigma',0.0569, 'cap',0.0039, 'cc1lin',0.7750,...
         'cc2',26.3950,'ck1lin',8.5342,'ck2',0.3069,'clmax',0.9397,...
         'cnmax',0.9663,'cx1lin',1.2307,'cx2',10.9297,'ef',2.7583,...
@@ -20,12 +20,12 @@ init_IX = 1.e-8;
 init_V = -44;
 init_nk = 0;
 init_Iint = 0;
-init_nV = -10;
+init_spkV = -10;
 
 yinit = {init_bLR, init_aG, init_cAMP, init_Ca,init_CaCAM,init_CAMK,init_IX,...
-    init_V, init_nk, init_Iint, init_nV};
+    init_V, init_nk, init_Iint, init_spkV};
 FN = {'bLR','aG','cAMP','Ca','CaCaM','aCaMK','IX',...
-    'V','nK','Iint', 'nV'};
+    'V','nK','Iint','spkV'};
 yinit = cell2struct(yinit,FN,2);
 N = size(PULSE.ton,1);
 var_names = fieldnames(yinit);
@@ -149,23 +149,28 @@ function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,N,JP)
         %% ML Spike
         nK = y(8*N+1:9*N,1);
         Iint = y(9*N+1:10*N,1);
-        nV = y(10*N+1:11*N,1);
-        [D_nV,D_nK,D_Iint] = ML_system(nV,nK,Iint);
+        spkV = y(10*N+1:11*N,1);
+        [D_spkV,D_nK,D_Iint] = ML_spk(V,spkV,nK,Iint);
+        
+        % spike reverse coupling
+        revC = 0.33;
+        D_V = D_V + revC*D_spkV;
         
         %%
-%         D_V = D_nV + D_V;
+        
 		dy = [D_bLR;D_aG;D_cAMP;D_Ca;D_CaCAM;D_CAMK;D_IX;...
-            D_V;D_nK;D_Iint;D_nV];
+            D_V;D_nK;D_Iint;D_spkV];
     end
 end
 
-function [D_nV,D_nK,D_Iint] = ML_system(Vm,nK,Iint)
+function [D_nV,D_nK,D_Iint] = ML_spk(Vm,V_ml,nK,Iint)
+    
     % Activation
-    vThr = -40; % ORN Rest = -44 mV
-    Istim = (Vm > vThr)*10; % Threshold = 100 nA
+    vThr = -43; % ORN_rest=-44 mV
+    Istim = (Vm > vThr)*89; % Thres=88 nA
     
     % Spike rate
-    FR = 10; % Hz
+    FR = 15; % Hz
     dt = 1e3; % convert ms -> s 
     dt = dt*FR/10; % Default T=100ms,FR=10
     
@@ -174,7 +179,7 @@ function [D_nV,D_nK,D_Iint] = ML_system(Vm,nK,Iint)
     % Slow current feedback for bursting
     epsi = .01; v0 = -26;
     dIint = @(v) epsi*(v0-v).*burst;
-    D_Iint = dt.*dIint(Vm);
+    D_Iint = dt.*dIint(V_ml);
     
     % K+ ion channel parameters
     vc = 2 + burst*10; vd = 30 - burst*12.6; phi_n = 0.04 + burst*0.19;
@@ -182,7 +187,7 @@ function [D_nV,D_nK,D_Iint] = ML_system(Vm,nK,Iint)
     xi_n    = @(v) (v-vc)./vd;                   % scaled argument for n-gate input
     ninf    = @(v) 0.5*(1+tanh(xi_n(v)));       % n-gate activation function
     tau_n   = @(v) 1./(phi_n.*cosh(xi_n(v)/2));  % n-gate activation t-const
-    D_nK = dt.*(ninf(Vm)-nK)./tau_n(Vm);
+    D_nK = dt.*(ninf(V_ml)-nK)./tau_n(V_ml);
     
     % Ca2+ ion channel parameters
     va = -1.2; vb = 18; % phi_m = 2;
@@ -199,9 +204,9 @@ function [D_nV,D_nK,D_Iint] = ML_system(Vm,nK,Iint)
     Cm  =  20;                % Membrane Conductance
 
     D_nV = (dt/Cm).*( Istim + Iint ...
-        - gL*(Vm-vL) ...
-        - gK*nK.*(Vm-vK) ...
-        - gCa*minf(Vm).*(Vm-vCa) );
+        - gL*(V_ml-vL) ...
+        - gK*nK.*(V_ml-vK) ...
+        - gCa*minf(V_ml).*(V_ml-vCa) );
     
 end
 
