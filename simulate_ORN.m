@@ -18,9 +18,9 @@ init_CAMK = 1.e-8;
 init_CaCAM = 1.e-8;
 init_IX = 1.e-8;
 init_V = -44;
-init_nk = 0.5;
+init_nk = 0;
 init_Iint = 0;
-init_nV = init_V;
+init_nV = -10;
 
 yinit = {init_bLR, init_aG, init_cAMP, init_Ca,init_CaCAM,init_CAMK,init_IX,...
     init_V, init_nk, init_Iint, init_nV};
@@ -89,7 +89,7 @@ end
 
 
 function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,N,JP) 
-    if toc > 120
+    if toc > inf
         error('Maximum execution time elapsed.');
     end
     
@@ -149,9 +149,8 @@ function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,N,JP)
         %% ML Spike
         nK = y(8*N+1:9*N,1);
         Iint = y(9*N+1:10*N,1);
-        nV = y(9*N+1:10*N,1);
-        
-        [D_nV,D_nK,D_Iint] = ML_neurons(nV,nK,Iint);
+        nV = y(10*N+1:11*N,1);
+        [D_nV,D_nK,D_Iint] = ML_system(nV,nK,Iint);
         
         %%
 %         D_V = D_nV + D_V;
@@ -160,14 +159,37 @@ function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,N,JP)
     end
 end
 
-function [D_nV,D_nK,D_Iint] = ML_neurons(Vm,nK,Iint)
-% [Vm,nK,nCa,Iint] = ML_neurons(det,dt,Istim,Iint,omega,nK,nCa,
-%                                 Vm,PreSynVm,synapse,burst)
-    dt = 1; 
-    Istim = 100;
+function [D_nV,D_nK,D_Iint] = ML_system(Vm,nK,Iint)
+    % Activation
+    vThr = -40; % ORN Rest = -44 mV
+    Istim = (Vm > vThr)*10; % Threshold = 100 nA
+    
+    % Spike rate
+    FR = 10; % Hz
+    dt = 1e3; % convert ms -> s 
+    dt = dt*FR/10; % Default T=100ms,FR=10
+    
+    % Internal bursting
     burst = 0;
-
-    % Model parameters for each neurons (from (Anderson et. al., 2015))
+    % Slow current feedback for bursting
+    epsi = .01; v0 = -26;
+    dIint = @(v) epsi*(v0-v).*burst;
+    D_Iint = dt.*dIint(Vm);
+    
+    % K+ ion channel parameters
+    vc = 2 + burst*10; vd = 30 - burst*12.6; phi_n = 0.04 + burst*0.19;
+    phi_n  = 0.02;
+    xi_n    = @(v) (v-vc)./vd;                   % scaled argument for n-gate input
+    ninf    = @(v) 0.5*(1+tanh(xi_n(v)));       % n-gate activation function
+    tau_n   = @(v) 1./(phi_n.*cosh(xi_n(v)/2));  % n-gate activation t-const
+    D_nK = dt.*(ninf(Vm)-nK)./tau_n(Vm);
+    
+    % Ca2+ ion channel parameters
+    va = -1.2; vb = 18; % phi_m = 2;
+    xi_m    = @(v) (v-va)/vb;                   % scaled argument for m-gate input
+    minf    = @(v) 0.5*(1+tanh(xi_m(v)));       % m-gate activation function
+    
+    % Membrane voltage parameters (Anderson et. al., 2015)
     vCa = 120;                % Rev.Pot for Calcium channels
     gCa = 4.4;                % Calcium conductance
     vK  = -84;                % Rev.Pot for Potassium channels
@@ -176,33 +198,10 @@ function [D_nV,D_nK,D_Iint] = ML_neurons(Vm,nK,Iint)
     gL  =   2;                % Leak channels conductance
     Cm  =  20;                % Membrane Conductance
 
-    % Bursting 
-    % Slow current feedback for bursting
-    epsi = .01; v0 = -26;
-    dIint = @(v) epsi*(v0-v).*burst;
-
-    % K+ ion channel parameters
-    vc = 2 + burst*10; vd = 30 - burst*12.6; phi_n = 0.04 + burst*0.19;
-    xi_n    = @(v) (v-vc)./vd;                   % scaled argument for n-gate input
-    ninf    = @(v) 0.5*(1+tanh(xi_n(v)));       % n-gate activation function
-    tau_n   = @(v) 1./(phi_n.*cosh(xi_n(v)/2));  % n-gate activation t-const
-    D_nK = (ninf(Vm)-nK)./tau_n(Vm);
-    nK_new = nK + dt*D_nK;
-    
-    
-    % Ca2+ ion channel parameters
-    va = -1.2; vb = 18; % phi_m = 2;
-    xi_m    = @(v) (v-va)/vb;                   % scaled argument for m-gate input
-    minf    = @(v) 0.5*(1+tanh(xi_m(v)));       % m-gate activation function
-
-%     Iint = Iint + dt*dIint(Vm);
-    D_Iint = dIint(Vm);
-
-    % Update membrane voltage for each neuron
     D_nV = (dt/Cm).*( Istim + Iint ...
         - gL*(Vm-vL) ...
-        - gK*nK_new.*(Vm-vK) ...
+        - gK*nK.*(Vm-vK) ...
         - gCa*minf(Vm).*(Vm-vCa) );
-
+    
 end
 

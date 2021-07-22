@@ -5,7 +5,7 @@ PULSE.toff = [1.2000  3
               1.2000  3];
 PULSE.conc = [0  0
               2  50];
-PULSE.tspan = 0:0.1:10;
+PULSE.tspan = 0:0.01:4;
 
 %% RUN
 DATA = simulate_ORN(PULSE);
