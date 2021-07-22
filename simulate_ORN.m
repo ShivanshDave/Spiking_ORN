@@ -1,14 +1,5 @@
-function DATA = simulate_ORN(PULSE)
-%% ORN System co-eff
-P = struct('Sigma',0.0569, 'cap',0.0039, 'cc1lin',0.7750,...
-        'cc2',26.3950,'ck1lin',8.5342,'ck2',0.3069,'clmax',0.9397,...
-        'cnmax',0.9663,'cx1lin',1.2307,'cx2',10.9297,'ef',2.7583,...
-        'gl',4.9195,'hmc1',1.4829,'hmc2',2.7678,'inf',1.7619,'inhmax',3.5697,...
-        'k1',0.1143,'k2lin',12.9344,'kI',10.0453,'kinh',1.0018,'kinhcng',0.5181,...
-        'n1',3.1844,'n2',3.1128,'nI',1.9848,'ninh',1.3081,'ninhcng',1.4511,...
-        'pd',7.5749,'r1',3.1663,'r2',6.5597,'smax',45.5118,'vcl',-7.7902,...
-        'vcng',0.0106,'vl',-44.0413);
-
+function DATA = simulate_ORN(PULSE,P,S)
+  
 %% Initialize
 init_bLR   = 1.e-8;
 init_aG    = 1.e-8;
@@ -45,7 +36,7 @@ tspan = [PULSE.tspan'];
 ODEOPTS = odeset('JPattern','on','MaxStep',0.9);
 
 tic % start timer
-[T,Y] = ode15s(@(t,y) SYSTEM(t,y,ODEOPTS,PULSE,P,N,JP), tspan, init_vals);
+[T,Y] = ode15s(@(t,y) SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP), tspan, init_vals);
 
 %Cut off the initial solution point which was just there to get us to steady-state.
 % T = T(2:end);
@@ -85,10 +76,13 @@ DATA.PRED = PRED;
 % DATA.IPRED = IPRED;
 DATA.IPREDn = IPREDn;
 DATA.T = T;
+DATA.P = P;
+DATA.S = S;
+
 end
 
 
-function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,N,JP) 
+function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP) 
     if toc > inf
         error('Maximum execution time elapsed.');
     end
@@ -150,63 +144,44 @@ function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,N,JP)
         nK = y(8*N+1:9*N,1);
         Iint = y(9*N+1:10*N,1);
         spkV = y(10*N+1:11*N,1);
-        [D_spkV,D_nK,D_Iint] = ML_spk(V,spkV,nK,Iint);
+        [D_spkV,D_nK,D_Iint] = ML_spk(V,spkV,nK,Iint,S);
         
         % spike reverse coupling
-        revC = 0.33;
-        D_V = D_V + revC*D_spkV;
+        D_V = D_V + S.revCp*D_spkV;
         
-        %%
-        
+        %%        
 		dy = [D_bLR;D_aG;D_cAMP;D_Ca;D_CaCAM;D_CAMK;D_IX;...
             D_V;D_nK;D_Iint;D_spkV];
     end
 end
 
-function [D_nV,D_nK,D_Iint] = ML_spk(Vm,V_ml,nK,Iint)
+function [D_nV,D_nK,D_Iint] = ML_spk(Vm,V_ml,nK,Iint,S)
     
     % Activation
-    vThr = -43; % ORN_rest=-44 mV
-    Istim = (Vm > vThr)*89; % Thres=88 nA
+    Istim = (Vm > S.spkThr)*57; % nA Thr@vL=(88,-60),(57,-44)
     
-    % Spike rate
-    FR = 15; % Hz
+    % Match ML_SPK time with ORN_SYSTEM time
     dt = 1e3; % convert ms -> s 
-    dt = dt*FR/10; % Default T=100ms,FR=10
+    dt = dt*S.maxFR/10; % Default T=100ms,FR=10
     
-    % Internal bursting
-    burst = 0;
-    % Slow current feedback for bursting
-    epsi = .01; v0 = -26;
-    dIint = @(v) epsi*(v0-v).*burst;
-    D_Iint = dt.*dIint(V_ml);
+    % Internal spiking
+    dIint = @(v) S.epsi_int*(S.v0_int-v).*S.intSpk;
+    D_Iint = dt.*(dIint(V_ml).*(V_ml < 0) - Iint.*(V_ml > 0));
     
-    % K+ ion channel parameters
-    vc = 2 + burst*10; vd = 30 - burst*12.6; phi_n = 0.04 + burst*0.19;
-    phi_n  = 0.02;
-    xi_n    = @(v) (v-vc)./vd;                   % scaled argument for n-gate input
-    ninf    = @(v) 0.5*(1+tanh(xi_n(v)));       % n-gate activation function
-    tau_n   = @(v) 1./(phi_n.*cosh(xi_n(v)/2));  % n-gate activation t-const
-    D_nK = dt.*(ninf(V_ml)-nK)./tau_n(V_ml);
-    
-    % Ca2+ ion channel parameters
-    va = -1.2; vb = 18; % phi_m = 2;
-    xi_m    = @(v) (v-va)/vb;                   % scaled argument for m-gate input
+    % Ca2+ ion channel
+    xi_m    = @(v) (v-S.va)/S.vb;                   % scaled argument for m-gate input
     minf    = @(v) 0.5*(1+tanh(xi_m(v)));       % m-gate activation function
     
-    % Membrane voltage parameters (Anderson et. al., 2015)
-    vCa = 120;                % Rev.Pot for Calcium channels
-    gCa = 4.4;                % Calcium conductance
-    vK  = -84;                % Rev.Pot for Potassium channels
-    gK  =   8;                % Potassium conductance
-    vL  = -60;                % Rev.Pot for leak channels
-    gL  =   2;                % Leak channels conductance
-    Cm  =  20;                % Membrane Conductance
-
-    D_nV = (dt/Cm).*( Istim + Iint ...
-        - gL*(V_ml-vL) ...
-        - gK*nK.*(V_ml-vK) ...
-        - gCa*minf(V_ml).*(V_ml-vCa) );
+    % K+ ion channel
+    xi_n    = @(v) (v-S.vc)./S.vd;                   % scaled argument for n-gate input
+    ninf    = @(v) 0.5*(1+tanh(xi_n(v)));       % n-gate activation function
+    tau_n   = @(v) 1./(S.phi_n.*cosh(xi_n(v)/2));  % n-gate activation t-const
+    D_nK = dt.*(ninf(V_ml)-nK)./tau_n(V_ml);    
+    
+    D_nV = (dt/S.Cm).*( Istim + Iint ...
+        - S.gL*(V_ml-S.vL) ...
+        - S.gK*nK.*(V_ml-S.vK) ...
+        - S.gCa*minf(V_ml).*(V_ml-S.vCa) );
     
 end
 
