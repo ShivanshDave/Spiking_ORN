@@ -21,10 +21,9 @@ P = struct('Sigma',0.0569, 'cap',0.0039, 'cc1lin',0.7750,...
 S = struct;
 
     % Spike properties
-    S.spkThr = -43.5; % (ORN_rest=-44) mV
+    S.spkThr = -43; % (ORN_rest=-44) mV
     S.maxFR = 25; % Max firing rate Hz
-    S.intSpk = 0; % Enable internal spiking
-    S.revCp = 0.1; % Reverse coupling from spkV to mem.Voltage
+    S.revCp = 0.3; % Reverse coupling from spkV to mem.Voltage
 
     % Membrane voltage parameters, adapted from (Anderson et. al., 2015)
     S.vCa = 120;                % Rev.Pot for Calcium channels
@@ -60,24 +59,21 @@ clf
 % ylabel('Conc. (uM)')
 
 nexttile
-plot(DATA.T,real(DATA.PRED.V))
+plot(DATA.T,real(DATA.PRED.ornV))
 xlabel('Time (sec)')
-ylabel('Mem. volt. (mV)')
+ylabel('Olfaction (mV)')
+title('ORN Voltage')
 
 nexttile
 plot(DATA.T,real(DATA.PRED.spkV))
 xlabel('Time (sec)')
-ylabel('Mem. volt. (mV)')
+ylabel('Spike (mV)')
+title('ML Spikes')
 
 nexttile
-plot(DATA.T,real(DATA.PRED.nK))
+plot(DATA.T,real(DATA.PRED.sFR))
 xlabel('Time (sec)')
-ylabel('nK [0:1]')
-
-nexttile
-plot(DATA.T,real(DATA.PRED.Iint))
-xlabel('Time (sec)')
-ylabel('I_int (nA)')
+ylabel('sFR')
 
 %%
 
