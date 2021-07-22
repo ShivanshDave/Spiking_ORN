@@ -3,32 +3,83 @@ PULSE.ton = [ 0.2000  2
               0.2000 2];
 PULSE.toff = [1.2000  3 
               1.2000  3];
-PULSE.conc = [0  5
-              2  5];
-PULSE.tspan = 0:0.1:4;
+PULSE.conc = [0  0
+              2  50];
+PULSE.tspan = 0:0.0001:4;
+
+%% ORN System co-eff
+P = struct('Sigma',0.0569, 'cap',0.0039, 'cc1lin',0.7750,...
+        'cc2',26.3950,'ck1lin',8.5342,'ck2',0.3069,'clmax',0.9397,...
+        'cnmax',0.9663,'cx1lin',1.2307,'cx2',10.9297,'ef',2.7583,...
+        'gl',4.9195,'hmc1',1.4829,'hmc2',2.7678,'inf',1.7619,'inhmax',3.5697,...
+        'k1',0.1143,'k2lin',12.9344,'kI',10.0453,'kinh',1.0018,'kinhcng',0.5181,...
+        'n1',3.1844,'n2',3.1128,'nI',1.9848,'ninh',1.3081,'ninhcng',1.4511,...
+        'pd',7.5749,'r1',3.1663,'r2',6.5597,'smax',45.5118,'vcl',-7.7902,...
+        'vcng',0.0106,'vl',-44.0413);
+
+% ML Spike sytem co-eff
+S = struct;
+
+    % Spike properties
+    S.spkThr = -43.5; % (ORN_rest=-44) mV
+    S.maxFR = 25; % Max firing rate Hz
+    S.intSpk = 0; % Enable internal spiking
+    S.revCp = 0.1; % Reverse coupling from spkV to mem.Voltage
+
+    % Membrane voltage parameters, adapted from (Anderson et. al., 2015)
+    S.vCa = 120;                % Rev.Pot for Calcium channels
+    S.gCa = 4.4;                % Calcium conductance
+    S.vK  = -84;                % Rev.Pot for Potassium channels
+    S.gK  =   8;                % Potassium conductance
+    S.vL  = -44; % -60          % Rev.Pot for leak channels
+    S.gL  =   2;                % Leak channels conductance
+    S.Cm  =  20;                % Membrane Conductance
+    % Ca2+ ion channel parameters
+    S.va = -1.2; S.vb = 18; % phi_m = 2;
+    % K+ ion channel parameters
+    S.vc = 2 ;%+ S.burst*10; 
+    S.vd = 30 ;%- S.burst*12.6; 
+    S.phi_n = 0.04 ;%+ S.burst*0.19; % S.phi_n  = 0.02; 
+    % Slow current feedback for bursting
+    S.epsi_int = .01; S.v0_int = -40;
+
 
 %% RUN
-DATA = simulate_ORN(PULSE);
+DATA = simulate_ORN(PULSE,P,S);
 
 %% Plot
-figure(1);
+figure(2);
 clf
 
-nexttile
-TT = linspace(DATA.T(1),DATA.T(end),100);
-OD = simulate_pulse_train(TT,PULSE.ton,PULSE.toff,PULSE.conc);
-OD = OD(end,:);
-plot(TT,OD,'r-');
-xlabel('Time (sec)')
-ylabel('Conc. (uM)')
+% nexttile
+% TT = linspace(DATA.T(1),DATA.T(end),100);
+% OD = simulate_pulse_train(TT,PULSE.ton,PULSE.toff,PULSE.conc);
+% OD = OD(end,:);
+% plot(TT,OD,'r-');
+% xlabel('Time (sec)')
+% ylabel('Conc. (uM)')
 
 nexttile
 plot(DATA.T,real(DATA.PRED.V))
 xlabel('Time (sec)')
 ylabel('Mem. volt. (mV)')
 
-%%
+nexttile
+plot(DATA.T,real(DATA.PRED.spkV))
+xlabel('Time (sec)')
+ylabel('Mem. volt. (mV)')
 
+nexttile
+plot(DATA.T,real(DATA.PRED.nK))
+xlabel('Time (sec)')
+ylabel('nK [0:1]')
+
+nexttile
+plot(DATA.T,real(DATA.PRED.Iint))
+xlabel('Time (sec)')
+ylabel('I_int (nA)')
+
+%%
 
 function OUT = simulate_pulse_train(tnow,ton,toff,val,varargin)
 %PULSE_TRAIN Generate a train of pulses.

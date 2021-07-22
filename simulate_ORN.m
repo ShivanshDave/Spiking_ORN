@@ -1,14 +1,5 @@
-function DATA = simulate_ORN(PULSE)
-%% System co-eff
-P = struct('Sigma',0.0569, 'cap',0.0039, 'cc1lin',0.7750,...
-        'cc2',26.3950,'ck1lin',8.5342,'ck2',0.3069,'clmax',0.9397,...
-        'cnmax',0.9663,'cx1lin',1.2307,'cx2',10.9297,'ef',2.7583,...
-        'gl',4.9195,'hmc1',1.4829,'hmc2',2.7678,'inf',1.7619,'inhmax',3.5697,...
-        'k1',0.1143,'k2lin',12.9344,'kI',10.0453,'kinh',1.0018,'kinhcng',0.5181,...
-        'n1',3.1844,'n2',3.1128,'nI',1.9848,'ninh',1.3081,'ninhcng',1.4511,...
-        'pd',7.5749,'r1',3.1663,'r2',6.5597,'smax',45.5118,'vcl',-7.7902,...
-        'vcng',0.0106,'vl',-44.0413);
-
+function DATA = simulate_ORN(PULSE,P,S)
+  
 %% Initialize
 init_bLR   = 1.e-8;
 init_aG    = 1.e-8;
@@ -17,10 +8,15 @@ init_Ca    = 1.e-8;
 init_CAMK = 1.e-8;
 init_CaCAM = 1.e-8;
 init_IX = 1.e-8;
-init_V = -70;
+init_V = -44;
+init_nk = 0;
+init_Iint = 0;
+init_spkV = -10;
 
-yinit = {init_bLR, init_aG, init_cAMP, init_Ca,init_CaCAM,init_CAMK,init_IX,init_V};
-FN = {'bLR','aG','cAMP','Ca','CaCaM','aCaMK','IX','V'};
+yinit = {init_bLR, init_aG, init_cAMP, init_Ca,init_CaCAM,init_CAMK,init_IX,...
+    init_V, init_nk, init_Iint, init_spkV};
+FN = {'bLR','aG','cAMP','Ca','CaCaM','aCaMK','IX',...
+    'V','nK','Iint','spkV'};
 yinit = cell2struct(yinit,FN,2);
 N = size(PULSE.ton,1);
 var_names = fieldnames(yinit);
@@ -36,15 +32,15 @@ JP = spdiags(ones(NEQ,2*NVAR-1),[-(NEQ-NCURVE):NCURVE:(NEQ-NCURVE)],NEQ,NEQ);
 
 %% SImulate
 %Solve for 6 seconds so that we may come to a steady-state from our initial conditions.
-tspan = [-6;PULSE.tspan'];
+tspan = [PULSE.tspan'];
 ODEOPTS = odeset('JPattern','on','MaxStep',0.9);
 
 tic % start timer
-[T,Y] = ode15s(@(t,y) SYSTEM(t,y,ODEOPTS,PULSE,P,N,JP), tspan, init_vals);
+[T,Y] = ode15s(@(t,y) SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP), tspan, init_vals);
 
 %Cut off the initial solution point which was just there to get us to steady-state.
-T = T(2:end);
-Y = Y(2:end,:);
+% T = T(2:end);
+% Y = Y(2:end,:);
 
 PRED = [];
 for j = 1:length(var_names)
@@ -80,11 +76,14 @@ DATA.PRED = PRED;
 % DATA.IPRED = IPRED;
 DATA.IPREDn = IPREDn;
 DATA.T = T;
+DATA.P = P;
+DATA.S = S;
+
 end
 
 
-function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,N,JP) 
-    if toc > 120
+function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP) 
+    if toc > inf
         error('Maximum execution time elapsed.');
     end
     
@@ -103,7 +102,7 @@ function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,N,JP)
 		CAMK = y(5*N+1:6*N,1);
 		IX = y(6*N+1:7*N,1);
 		V = y(7*N+1:8*N,1);
-
+        
 		%#####LIGAND-RECEPTOR INTERACTION#####
 		k2 = P.k2lin.*bLR;
 		%#####TRANSDUCTION####################
@@ -141,6 +140,48 @@ function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,N,JP)
 		D_IX = cx1 - P.cx2.*IX;  %This has got to go back down in order for oscillations...
 		D_V = (1./P.cap).*(Icng + Icacl + Il);
         
-		dy = [D_bLR;D_aG;D_cAMP;D_Ca;D_CaCAM;D_CAMK;D_IX;D_V];
+        %% ML Spike
+        nK = y(8*N+1:9*N,1);
+        Iint = y(9*N+1:10*N,1);
+        spkV = y(10*N+1:11*N,1);
+        [D_spkV,D_nK,D_Iint] = ML_spk(V,spkV,nK,Iint,S);
+        
+        % spike reverse coupling
+        D_V = D_V + S.revCp*D_spkV;
+        
+        %%        
+		dy = [D_bLR;D_aG;D_cAMP;D_Ca;D_CaCAM;D_CAMK;D_IX;...
+            D_V;D_nK;D_Iint;D_spkV];
     end
 end
+
+function [D_nV,D_nK,D_Iint] = ML_spk(Vm,V_ml,nK,Iint,S)
+    
+    % Activation
+    Istim = (Vm > S.spkThr)*57; % nA Thr@vL=(88,-60),(57,-44)
+    
+    % Match ML_SPK time with ORN_SYSTEM time
+    dt = 1e3; % convert ms -> s 
+    dt = dt*S.maxFR/10; % Default T=100ms,FR=10
+    
+    % Internal spiking
+    dIint = @(v) S.epsi_int*(S.v0_int-v).*S.intSpk;
+    D_Iint = dt.*(dIint(V_ml).*(V_ml < 0) - Iint.*(V_ml > 0));
+    
+    % Ca2+ ion channel
+    xi_m    = @(v) (v-S.va)/S.vb;                   % scaled argument for m-gate input
+    minf    = @(v) 0.5*(1+tanh(xi_m(v)));       % m-gate activation function
+    
+    % K+ ion channel
+    xi_n    = @(v) (v-S.vc)./S.vd;                   % scaled argument for n-gate input
+    ninf    = @(v) 0.5*(1+tanh(xi_n(v)));       % n-gate activation function
+    tau_n   = @(v) 1./(S.phi_n.*cosh(xi_n(v)/2));  % n-gate activation t-const
+    D_nK = dt.*(ninf(V_ml)-nK)./tau_n(V_ml);    
+    
+    D_nV = (dt/S.Cm).*( Istim + Iint ...
+        - S.gL*(V_ml-S.vL) ...
+        - S.gK*nK.*(V_ml-S.vK) ...
+        - S.gCa*minf(V_ml).*(V_ml-S.vCa) );
+    
+end
+
