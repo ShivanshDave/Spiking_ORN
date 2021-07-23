@@ -2,7 +2,7 @@ function working_example()
 
 % Add labels and init-values for new variable
 FN = {'y_fxn','y_track'}; % 
-yinit = {0,0};
+yinit = {0,1};
 
 % Reduced complexity without the changing structure of the model
 % Removed parallel computation for multiple ORNs
@@ -43,7 +43,10 @@ function dy = SYSTEM(t,y,ODEOPTS,JP)
     D_y_fxn = -cos(t); % To get a sine-wave
 
     % Tracking logic
-    D_y_track = 1;  
+    base = 1; rise = 2;
+    D_y_track = rise.*(D_y_fxn > 0.1) ...
+        - 4*rise.*(D_y_fxn < 0.1 && y(2)>base);
+    
 
 
     dy = [D_y_fxn; D_y_track];
