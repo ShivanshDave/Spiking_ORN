@@ -151,7 +151,7 @@ function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP)
         [D_spkV,D_nK,D_sFR] = ML_spk(S,spkV,nK,sFR,ornV,D_ornV);
         
         % spike reverse coupling
-        D_ornV = D_ornV + S.revCp*D_spkV;
+        D_ornV = D_ornV + (S.revCp./(2*sFR)).*D_spkV;
         
         %%        
 		dy = [D_bLR;D_aG;D_cAMP;D_Ca;...
@@ -169,6 +169,7 @@ function [D_spkV,D_nK,D_sFR] = ML_spk(S,spkV,nK,sFR,ornV,D_ornV)
     % Match ML_SPK time with ORN_SYSTEM time
     ct = 1e3; % convert ms -> s 
     ct = ct*S.maxFR/10; % Default T=100ms,FR=10
+    ct = ct./(sFR);
     
     % FR modulation based on slope
 %     dIint = @(v) S.epsi_int*(S.v0_int-v).*S.intSpk;
@@ -192,7 +193,7 @@ function [D_spkV,D_nK,D_sFR] = ML_spk(S,spkV,nK,sFR,ornV,D_ornV)
 %     D_sFR = (ornV+44).*(4*(D_ornV > 0.1) - 2*(D_ornV < -0.1));
     base = 1; rise = 2;
     D_sFR = (ornV+44).*(rise.*(D_ornV > 0) ...
-        - rise.*(D_ornV < 0 & sFR>base));
+        - 100*rise.*(D_ornV < 0.01 & sFR>base & abs(D_nK)<0.01));
     
 end
 

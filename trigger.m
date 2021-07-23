@@ -24,7 +24,7 @@ P = struct('Sigma',0.0569, 'cap',0.0039, 'cc1lin',0.7750,...
 S = struct;
 
     % Spike properties
-    S.spkThr = -43; % (ORN_rest=-44) mV
+    S.spkThr = -43.5; % (ORN_rest=-44) mV
     S.maxFR = 25; % Max firing rate Hz
     S.revCp = 0.3; % Reverse coupling from spkV to mem.Voltage
 
