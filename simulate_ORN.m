@@ -1,8 +1,8 @@
 function DATA = simulate_ORN(PULSE,P,S)
 
-global ind
+global ind pk
 ind = 0;
-    
+
 %% Initialize
 init_bLR    = 1.e-8; %1
 init_aG     = 1.e-8; %2
@@ -25,6 +25,7 @@ FN = {'bLR','aG','cAMP','Ca',...
     'spkV','nK','sFR'};
 yinit = cell2struct(yinit,FN,2);
 N = size(PULSE.ton,1);
+pk = zeros(N,1);   
 var_names = fieldnames(yinit);
 init_vals = struct2cell(yinit);
 init_vals = [init_vals{:}];
@@ -87,13 +88,13 @@ DATA.S = S;
 DATA.ind = ind;
 end
 
-
 function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP)
 
     % global ind
     % ind = [ind ind(end)+1];
     
     if toc > 15
+        disp(t)
         if ~strcmp(input('Run for 15 more sec? y/n : ','s'),'y')
             error('Timeout');
         else 
@@ -153,17 +154,12 @@ function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP)
 		D_CaCAM = cc1 - P.cc2.*CaCAM;
 		D_CAMK = ck1 - P.ck2.*CAMK;
 		D_IX = cx1 - P.cx2.*IX;  %This has got to go back down in order for oscillations...
-		D_ornV = (1./P.cap).*(Icng + Icacl + Il);
+		E_ornV = (1./P.cap).*(Icng + Icacl + Il);
         %% ML Spike
         spkV = read(N,y,9);
         nK 	= read(N,y,10);
         sFR = read(N,y,11);
-        
-        [D_spkV,D_nK,D_sFR] = ML_spk(S,spkV,nK,sFR,ornV,D_ornV);
-        
-        % spike reverse coupling
-        D_ornV = D_ornV + (S.revCp./(2*sFR)).*D_spkV;
-        
+        [D_ornV, D_spkV,D_nK,D_sFR] = ML_spk(S,spkV,nK,sFR,ornV,E_ornV);        
         %%        
 		dy = [D_bLR;D_aG;D_cAMP;D_Ca;...
             D_CaCAM;D_CAMK;D_IX;D_ornV;...
@@ -171,8 +167,10 @@ function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP)
     end
 end
 
-function [D_spkV,D_nK,D_sFR] = ML_spk(S,spkV,nK,sFR,ornV,D_ornV)
-
+function [D_ornV,D_spkV,D_nK,D_sFR] = ML_spk(S,spkV,nK,sFR,ornV,E_ornV)
+    global pk
+    % detect peak
+    
     
     % Activation
     Istim = (ornV > S.spkThr)*57; % nA Thr@vL=(88,-60),(57,-44)
@@ -202,9 +200,15 @@ function [D_spkV,D_nK,D_sFR] = ML_spk(S,spkV,nK,sFR,ornV,D_ornV)
         - S.gCa*minf(spkV).*(spkV-S.vCa) );
     
 %     D_sFR = (ornV+44).*(4*(D_ornV > 0.1) - 2*(D_ornV < -0.1));
-    base = 1; rise = 2;
-    D_sFR = (ornV+44).*(rise.*(D_ornV > 0) ...
-        - 100*rise.*(D_ornV < 0.01 & sFR>base & abs(D_nK)<0.01));
+    base = 1; rise = 2; fall = 100;
+    D_sFR = (ornV+44).*(rise.*(E_ornV > 0) ...
+        - fall.*(pk > ornV & sFR>base & abs(D_nK)<0.01));
+%         - fall.*(E_ornV < 0 & sFR>base & abs(D_nK)<0.01));
     
+    % spike reverse coupling
+    D_ornV = E_ornV + (S.revCp./(1)).*D_spkV;
+    
+    
+    pk = ornV.*(ornV > pk) + pk.*(ornV < pk);
 end
 
