@@ -1,10 +1,13 @@
 %% Odor-pulse setup
 PULSE.ton = [ 0.2000  2 
+              0.2000 2
               0.2000 2];
 PULSE.toff = [1.2000  3 
+              1.2000  3
               1.2000  3];
 PULSE.conc = [0  0
-              2  50];
+              5  50
+              50 5];
 PULSE.tspan = 0:0.0001:4;
 
 %% ORN System co-eff
@@ -47,7 +50,7 @@ S = struct;
 DATA = simulate_ORN(PULSE,P,S);
 
 %% Plot
-figure(2);
+figure(1);
 clf
 
 % nexttile

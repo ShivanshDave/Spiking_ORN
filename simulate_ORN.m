@@ -11,7 +11,7 @@ init_IX     = 1.e-8; %7
 init_ornV   = -44;   %8
 init_spkV   = -10;   %9 ML dV/dt
 init_nk     = 0;    %10 ML dN/dt 
-init_sFR    = 0;    %11 ML dV/dt
+init_sFR    = 1;    %11 ML d(slope)/dt
 
 
 yinit = {init_bLR, init_aG, init_cAMP, init_Ca,...
@@ -169,9 +169,6 @@ function [D_spkV,D_nK,D_sFR] = ML_spk(S,spkV,nK,sFR,ornV,D_ornV)
     % Match ML_SPK time with ORN_SYSTEM time
     ct = 1e3; % convert ms -> s 
     ct = ct*S.maxFR/10; % Default T=100ms,FR=10
-    if sFR<0; sFR=0; end
-%     ct = ct.*(sFR);
-
     
     % FR modulation based on slope
 %     dIint = @(v) S.epsi_int*(S.v0_int-v).*S.intSpk;
@@ -192,7 +189,10 @@ function [D_spkV,D_nK,D_sFR] = ML_spk(S,spkV,nK,sFR,ornV,D_ornV)
         - S.gK*nK.*(spkV-S.vK) ...
         - S.gCa*minf(spkV).*(spkV-S.vCa) );
     
-    D_sFR = (ornV+44).*(4*(D_ornV > 0.1) - 2*(D_ornV < -0.1));
+%     D_sFR = (ornV+44).*(4*(D_ornV > 0.1) - 2*(D_ornV < -0.1));
+    base = 1; rise = 2;
+    D_sFR = (ornV+44).*(rise.*(D_ornV > 0) ...
+        - rise.*(D_ornV < 0 & sFR>base));
     
 end
 
