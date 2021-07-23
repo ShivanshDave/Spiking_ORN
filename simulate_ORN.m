@@ -1,5 +1,8 @@
 function DATA = simulate_ORN(PULSE,P,S)
-  
+
+global ind
+ind = 0;
+    
 %% Initialize
 init_bLR    = 1.e-8; %1
 init_aG     = 1.e-8; %2
@@ -81,13 +84,21 @@ DATA.IPREDn = IPREDn;
 DATA.T = T;
 DATA.P = P;
 DATA.S = S;
-
+DATA.ind = ind;
 end
 
 
-function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP) 
-    if toc > inf
-        error('Maximum execution time elapsed.');
+function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP)
+
+    % global ind
+    % ind = [ind ind(end)+1];
+    
+    if toc > 15
+        if ~strcmp(input('Run for 15 more sec? y/n : ','s'),'y')
+            error('Timeout');
+        else 
+            tic;
+        end
     end
     
     if strcmp(ODEOPTS,'jpattern')

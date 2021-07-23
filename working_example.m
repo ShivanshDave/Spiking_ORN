@@ -1,5 +1,8 @@
 function working_example()
 
+global X
+X=0;
+
 % Add labels and init-values for new variable
 FN = {'y_fxn','y_track'}; % 
 yinit = {0,1};
@@ -35,6 +38,9 @@ end
 
 
 function dy = SYSTEM(t,y,ODEOPTS,JP) 
+    global X
+
+
     if strcmp(ODEOPTS,'jpattern')
 		dy = JP;
         return;
@@ -46,6 +52,7 @@ function dy = SYSTEM(t,y,ODEOPTS,JP)
     base = 1; rise = 2;
     D_y_track = rise.*(D_y_fxn > 0.1) ...
         - 4*rise.*(D_y_fxn < 0.1 && y(2)>base);
+    X = [X X(end)+1];
     
 
 

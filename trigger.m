@@ -8,7 +8,7 @@ PULSE.toff = [1.2000  3
 PULSE.conc = [0  0
               5  50
               50 5];
-PULSE.tspan = 0:0.0001:4;
+PULSE.tspan = [0 4];
 
 %% ORN System co-eff
 P = struct('Sigma',0.0569, 'cap',0.0039, 'cc1lin',0.7750,...
@@ -24,8 +24,8 @@ P = struct('Sigma',0.0569, 'cap',0.0039, 'cc1lin',0.7750,...
 S = struct;
 
     % Spike properties
-    S.spkThr = -43.5; % (ORN_rest=-44) mV
-    S.maxFR = 25; % Max firing rate Hz
+    S.spkThr = -42; % (ORN_rest=-44) mV
+    S.maxFR = 75; % Max firing rate Hz
     S.revCp = 0.3; % Reverse coupling from spkV to mem.Voltage
 
     % Membrane voltage parameters, adapted from (Anderson et. al., 2015)
