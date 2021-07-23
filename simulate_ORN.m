@@ -1,13 +1,13 @@
 function DATA = simulate_ORN(PULSE,P,S)
   
 %% Initialize
-init_bLR    = 1.e-8; %1
-init_aG     = 1.e-8; %2
-init_cAMP   = 1.e-8; %3
-init_Ca     = 1.e-8; %4
-init_CAMK   = 1.e-8; %5
-init_CaCAM  = 1.e-8; %6
-init_IX     = 1.e-8; %7
+init_bLR    = 1; %1
+init_aG     = 1; %2
+init_cAMP   = 1; %3
+init_Ca     = 1; %4
+init_CAMK   = 1; %5
+init_CaCAM  = 1; %6
+init_IX     = 1; %7
 init_ornV   = -44;   %8
 init_spkV   = -10;   %9 ML dV/dt
 init_nk     = 0;    %10 ML dN/dt 
@@ -26,20 +26,33 @@ var_names = fieldnames(yinit);
 init_vals = struct2cell(yinit);
 init_vals = [init_vals{:}];
 init_vals = repmat(init_vals(:)',N,1);
-init_vals = init_vals(:)';		
+init_vals = init_vals';		
 
-NVAR = length(var_names);
-NCURVE = length(PULSE.ton(:,1));
-NEQ = NVAR*NCURVE;
-JP = spdiags(ones(NEQ,2*NVAR-1),[-(NEQ-NCURVE):NCURVE:(NEQ-NCURVE)],NEQ,NEQ);
+% NVAR = length(var_names);
+% NCURVE = length(PULSE.ton(:,1));
+% NEQ = NVAR*NCURVE;
+% JP = spdiags(ones(NEQ,2*NVAR-1),[-(NEQ-NCURVE):NCURVE:(NEQ-NCURVE)],NEQ,NEQ);
 
 %% SImulate
 %Solve for 6 seconds so that we may come to a steady-state from our initial conditions.
 tspan = [PULSE.tspan'];
-ODEOPTS = odeset('JPattern','on','MaxStep',0.9);
+% ODEOPTS = odeset('JPattern','on','MaxStep',0.9);
 
 tic % start timer
-[T,Y] = ode15s(@(t,y) SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP), tspan, init_vals);
+% [T,Y] = ode15s(@(t,y) SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP), tspan, init_vals);
+
+y = init_vals;
+dt = PULSE.tspan(2) - PULSE.tspan(1);
+for i=1:length(tspan)
+    t = tspan(i);
+    dy = SYSTEM(t,y,PULSE,P,S,N);
+    if sum(isnan(real(y(:))))
+        warning('A')
+    end
+    y = y + dt.*real(dy);
+end
+
+
 
 %Cut off the initial solution point which was just there to get us to steady-state.
 % T = T(2:end);
@@ -47,7 +60,7 @@ tic % start timer
 
 PRED = [];
 for j = 1:length(var_names)
-    PRED.(var_names{j}) = Y(:,((j-1)*N+1):(j*N));
+    PRED.(var_names{j}) = y(:,((j-1)*N+1):(j*N));
 end
 
 %% Compute currents
@@ -85,19 +98,16 @@ DATA.S = S;
 end
 
 
-function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP) 
+function dy = SYSTEM(t,y,PULSE,P,S,N)
     if toc > inf
         error('Maximum execution time elapsed.');
     end
     
-    if strcmp(ODEOPTS,'jpattern')
-		dy = JP;
-    else
 		%Define the tot variables to be 1.
 		P.Rtot = 1;
 		P.Gtot = 1;
 
-        read = @(N,Y,i) y((i-1)*N+1:(i)*N,1);
+        read = @(N,Y,i) Y((i-1)*N+1:(i)*N);
         bLR     = read(N,y,1);
 		aG      = read(N,y,2);
 		cAMP    = read(N,y,3);
@@ -129,7 +139,7 @@ function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP)
 		Il = P.gl.*(P.vl-ornV);
 
         hv = @(x) 1./(1+exp(-x./0.001));
-        Ostim = sum(PULSE.conc.*(hv(t-PULSE.ton)- hv(t-PULSE.toff)),2);
+        Ostim = sum(PULSE.conc.*(hv(t-PULSE.ton)- hv(t-PULSE.toff)),2)';
 
 		%#####ODOR STIMLUATION & LIGAND-RECEPTOR INTERACTION#####
 		D_bLR = P.k1*Ostim.*(P.Rtot-bLR) - P.r1.*bLR;
@@ -157,7 +167,6 @@ function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP)
 		dy = [D_bLR;D_aG;D_cAMP;D_Ca;...
             D_CaCAM;D_CAMK;D_IX;D_ornV;...
             D_spkV;D_nK;D_sFR];
-    end
 end
 
 function [D_spkV,D_nK,D_sFR] = ML_spk(S,spkV,nK,sFR,ornV,D_ornV)

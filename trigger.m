@@ -5,7 +5,7 @@ PULSE.toff = [1.2000  3
               1.2000  3];
 PULSE.conc = [0  0
               2  50];
-PULSE.tspan = 0:0.0001:4;
+PULSE.tspan = 0:1e-7:4;
 
 %% ORN System co-eff
 P = struct('Sigma',0.0569, 'cap',0.0039, 'cc1lin',0.7750,...
