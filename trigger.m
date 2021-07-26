@@ -1,11 +1,14 @@
 %% Odor-pulse setup
 PULSE.ton = [ 0.2000  2 
+              0.2000 2
               0.2000 2];
 PULSE.toff = [1.2000  3 
+              1.2000  3
               1.2000  3];
 PULSE.conc = [0  0
-              2  50];
-PULSE.tspan = 0:0.0001:4;
+              5  50
+              50 5];
+PULSE.tspan = [0 4];
 
 %% ORN System co-eff
 P = struct('Sigma',0.0569, 'cap',0.0039, 'cc1lin',0.7750,...
@@ -20,34 +23,34 @@ P = struct('Sigma',0.0569, 'cap',0.0039, 'cc1lin',0.7750,...
 % ML Spike sytem co-eff
 S = struct;
 
-    % Spike properties
-    S.spkThr = -43; % (ORN_rest=-44) mV
-    S.maxFR = 25; % Max firing rate Hz
-    S.revCp = 0.3; % Reverse coupling from spkV to mem.Voltage
+% Spike properties
+S.spkThr = -43; % (ORN_rest=-44) mV
+S.maxFR = 30; % Max firing rate Hz
+S.revCp = 2; % Reverse coupling from spkV to mem.Voltage
 
-    % Membrane voltage parameters, adapted from (Anderson et. al., 2015)
-    S.vCa = 120;                % Rev.Pot for Calcium channels
-    S.gCa = 4.4;                % Calcium conductance
-    S.vK  = -84;                % Rev.Pot for Potassium channels
-    S.gK  =   8;                % Potassium conductance
-    S.vL  = -44; % -60          % Rev.Pot for leak channels
-    S.gL  =   2;                % Leak channels conductance
-    S.Cm  =  20;                % Membrane Conductance
-    % Ca2+ ion channel parameters
-    S.va = -1.2; S.vb = 18; % phi_m = 2;
-    % K+ ion channel parameters
-    S.vc = 2 ;%+ S.burst*10; 
-    S.vd = 30 ;%- S.burst*12.6; 
-    S.phi_n = 0.04 ;%+ S.burst*0.19; % S.phi_n  = 0.02; 
-    % Slow current feedback for bursting
-    S.epsi_int = .01; S.v0_int = -40;
+% Membrane voltage parameters, adapted from (Anderson et. al., 2015)
+S.vCa = 120;                % Rev.Pot for Calcium channels
+S.gCa = 4.4;                % Calcium conductance
+S.vK  = -84;                % Rev.Pot for Potassium channels
+S.gK  =   8;                % Potassium conductance
+S.vL  = -44; % -60          % Rev.Pot for leak channels
+S.gL  =   2;                % Leak channels conductance
+S.Cm  =  20;                % Membrane Conductance
+% Ca2+ ion channel parameters
+S.va = -1.2; S.vb = 18; % phi_m = 2;
+% K+ ion channel parameters
+S.vc = 2 ;%+ S.burst*10; 
+S.vd = 30 ;%- S.burst*12.6; 
+S.phi_n = 0.04 ;%+ S.burst*0.19; % S.phi_n  = 0.02; 
+% Slow current feedback for bursting
+S.epsi_int = .01; S.v0_int = -40;
 
 
 %% RUN
 DATA = simulate_ORN(PULSE,P,S);
 
 %% Plot
-figure(2);
+figure(1);
 clf
 
 % nexttile
@@ -73,8 +76,26 @@ title('ML Spikes')
 nexttile
 plot(DATA.T,real(DATA.PRED.sFR))
 xlabel('Time (sec)')
-ylabel('sFR')
+title('sFR')
 
+nexttile
+plot(DATA.T,real(DATA.PRED.nK))
+xlabel('Time (sec)')
+title('nK')
+
+nexttile; 
+plot(DATA.T,real(DATA.PRED.Ca))
+xlabel('Time (sec)')
+ylabel('Calcium')
+title('Ca')
+
+nexttile; 
+plot(DATA.T,real(DATA.IPREDn.PRED_CURRENT))
+xlabel('Time (sec)')
+ylabel('Receptor (pA)')
+title('Predicted Current')
+
+disp('---Done---')
 %%
 
 function OUT = simulate_pulse_train(tnow,ton,toff,val,varargin)
