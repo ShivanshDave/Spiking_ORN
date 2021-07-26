@@ -1,76 +1,3 @@
-% Odor-pulse setup
-PULSE.ton = [ 0.2000  2 
-              0.2000 2
-              0.2000 2];
-PULSE.toff = [1.2000  3 
-              1.2000  3
-              1.2000  3];
-PULSE.conc = [0  0
-              5  20
-              20 5];
-PULSE.tspan = [0 4];
-
-
-%% RUN
-DATA = simulate_ORN(PULSE);
-
-%% Plot
-figure;
-clf
-
-% nexttile
-% TT = linspace(DATA.T(1),DATA.T(end),100);
-% OD = simulate_pulse_train(TT,PULSE.ton,PULSE.toff,PULSE.conc);
-% OD = OD(end,:);
-% plot(TT,OD,'r-');
-% xlabel('Time (sec)')
-% ylabel('Conc. (uM)')
-
-t = tiledlayout(3,2,'TileSpacing','none','Padding','compact');
-
-nexttile
-plot(DATA.T,real(DATA.PRED.ornV))
-xlabel('Time (sec)')
-ylabel('Olfaction (mV)')
-title('ORN Voltage')
-set(gca,'FontSize',14);
-
-nexttile
-plot(DATA.T,real(DATA.PRED.spkV))
-xlabel('Time (sec)')
-ylabel('Spike (mV)')
-title('ML Spikes')
-set(gca,'FontSize',14);
-
-nexttile
-plot(DATA.T,real(DATA.PRED.CaFR))
-xlabel('Time (sec)')
-title('CaFR')
-set(gca,'FontSize',14);
-
-nexttile
-plot(DATA.T,real(DATA.PRED.nK))
-xlabel('Time (sec)')
-title('nK')
-set(gca,'FontSize',14);
-
-nexttile; 
-plot(DATA.T,real(DATA.PRED.Ca))
-xlabel('Time (sec)')
-ylabel('Calcium')
-title('Ca')
-set(gca,'FontSize',14);
-
-nexttile; 
-plot(DATA.T,real(DATA.IPREDn.PRED_CURRENT))
-xlabel('Time (sec)')
-ylabel('Receptor (pA)')
-title('Predicted Current')
-set(gca,'FontSize',14);
-
-disp('---Done---')
-%%
-
 function OUT = simulate_pulse_train(tnow,ton,toff,val,varargin)
 %PULSE_TRAIN Generate a train of pulses.
 %   V = PULSE_TRAIN(T,TON,TOFF,VAL) returns a pulse train
@@ -134,6 +61,4 @@ end
         OUT = 1./(1+exp(-x./SHARPNESS));
 
     end
-
-
 end
