@@ -24,9 +24,9 @@ P = struct('Sigma',0.0569, 'cap',0.0039, 'cc1lin',0.7750,...
 S = struct;
 
 % Spike properties
-S.spkThr = -42; % (ORN_rest=-44) mV
-S.maxFR = 75; % Max firing rate Hz
-S.revCp = 0.3; % Reverse coupling from spkV to mem.Voltage
+S.spkThr = -43; % (ORN_rest=-44) mV
+S.maxFR = 30; % Max firing rate Hz
+S.revCp = 2; % Reverse coupling from spkV to mem.Voltage
 
 % Membrane voltage parameters, adapted from (Anderson et. al., 2015)
 S.vCa = 120;                % Rev.Pot for Calcium channels
@@ -83,11 +83,17 @@ plot(DATA.T,real(DATA.PRED.nK))
 xlabel('Time (sec)')
 title('nK')
 
-% nexttile; 
-% plot(DATA.T,DATA.IPREDn.PRED_CURRENT)
-% xlabel('Time (sec)')
-% ylabel('Receptor (pA)')
-% title('Predicted Current')
+nexttile; 
+plot(DATA.T,real(DATA.PRED.Ca))
+xlabel('Time (sec)')
+ylabel('Calcium')
+title('Ca')
+
+nexttile; 
+plot(DATA.T,real(DATA.IPREDn.PRED_CURRENT))
+xlabel('Time (sec)')
+ylabel('Receptor (pA)')
+title('Predicted Current')
 
 disp('---Done---')
 %%

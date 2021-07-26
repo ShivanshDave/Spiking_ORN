@@ -1,8 +1,5 @@
 function DATA = simulate_ORN(PULSE,P,S)
 
-global ind pk
-ind = 0;
-
 %% Initialize
 init_bLR    = 1.e-8; %1
 init_aG     = 1.e-8; %2
@@ -25,7 +22,6 @@ FN = {'bLR','aG','cAMP','Ca',...
     'spkV','nK','sFR'};
 yinit = cell2struct(yinit,FN,2);
 N = size(PULSE.ton,1);
-pk = zeros(N,1);   
 var_names = fieldnames(yinit);
 init_vals = struct2cell(yinit);
 init_vals = [init_vals{:}];
@@ -85,13 +81,12 @@ DATA.IPREDn = IPREDn;
 DATA.T = T;
 DATA.P = P;
 DATA.S = S;
-DATA.ind = ind;
+
+disp(toc)
+
 end
 
 function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP)
-
-    % global ind
-    % ind = [ind ind(end)+1];
     
     if toc > 15
         disp(t)
@@ -154,12 +149,12 @@ function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP)
 		D_CaCAM = cc1 - P.cc2.*CaCAM;
 		D_CAMK = ck1 - P.ck2.*CAMK;
 		D_IX = cx1 - P.cx2.*IX;  %This has got to go back down in order for oscillations...
-		E_ornV = (1./P.cap).*(Icng + Icacl + Il);
+		D_txnV = (1./P.cap).*(Icng + Icacl + Il);
         %% ML Spike
         spkV = read(N,y,9);
-        nK 	= read(N,y,10);
+        nK = read(N,y,10);
         sFR = read(N,y,11);
-        [D_ornV, D_spkV,D_nK,D_sFR] = ML_spk(S,spkV,nK,sFR,ornV,E_ornV);        
+        [D_ornV,D_spkV,D_nK,D_sFR] = ML_spk(S,spkV,nK,sFR,ornV,D_txnV,Ca,D_Ca);        
         %%        
 		dy = [D_bLR;D_aG;D_cAMP;D_Ca;...
             D_CaCAM;D_CAMK;D_IX;D_ornV;...
@@ -167,48 +162,39 @@ function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP)
     end
 end
 
-function [D_ornV,D_spkV,D_nK,D_sFR] = ML_spk(S,spkV,nK,sFR,ornV,E_ornV)
-    global pk
-    % detect peak
-    
-    
-    % Activation
-    Istim = (ornV > S.spkThr)*57; % nA Thr@vL=(88,-60),(57,-44)
-    
+function [D_ornV,D_spkV,D_nK,D_sFR] = ML_spk(S,spkV,nK,sFR,...
+                                             ornV,D_txnV,Ca,D_Ca)    
     % Match ML_SPK time with ORN_SYSTEM time
     ct = 1e3; % convert ms -> s 
     ct = ct*S.maxFR/10; % Default T=100ms,FR=10
+    
+    % Ca-dependent firing rate modulation
     ct = ct./(sFR);
-    
-    % FR modulation based on slope
-%     dIint = @(v) S.epsi_int*(S.v0_int-v).*S.intSpk;
-%     D_Iint = ct.*(dIint(V_ml).*(V_ml < 0) - Iint.*(V_ml > 0));
-    
+    base = 1; rise = 2; fall = 100;
+    D_sFR = Ca.*( rise.*(D_Ca > 0) ...
+    - fall.*(D_Ca < 0 & sFR>base)    );
+
     % Ca2+ ion channel
     xi_m    = @(v) (v-S.va)/S.vb;                   % scaled argument for m-gate input
-    minf    = @(v) 0.5*(1+tanh(xi_m(v)));       % m-gate activation function
-    
+    minf    = @(v) 0.5*(1+tanh(xi_m(v)));       % m-gate activation function    
     % K+ ion channel
     xi_n    = @(v) (v-S.vc)./S.vd;                   % scaled argument for n-gate input
     ninf    = @(v) 0.5*(1+tanh(xi_n(v)));       % n-gate activation function
     tau_n   = @(v) 1./(S.phi_n.*cosh(xi_n(v)/2));  % n-gate activation t-const
-    D_nK = ct.*(ninf(spkV)-nK)./tau_n(spkV);    
+    D_nK = ct.*(ninf(spkV)-nK)./tau_n(spkV);
     
-    D_spkV = (ct/S.Cm).*( Istim ...
+    % Ca2+ current
+    Ica = D_Ca.*10./(1+Ca); %nA
+    % Channel Activation
+    Iion = (ornV > S.spkThr)*25; % nA Thr@vL=(88,-60),(57,-44)    
+    
+    D_spkV = (ct/S.Cm).*( Iion + Ica ...
         - S.gL*(spkV-S.vL) ...
         - S.gK*nK.*(spkV-S.vK) ...
         - S.gCa*minf(spkV).*(spkV-S.vCa) );
     
-%     D_sFR = (ornV+44).*(4*(D_ornV > 0.1) - 2*(D_ornV < -0.1));
-    base = 1; rise = 2; fall = 100;
-    D_sFR = (ornV+44).*(rise.*(E_ornV > 0) ...
-        - fall.*(pk > ornV & sFR>base & abs(D_nK)<0.01));
-%         - fall.*(E_ornV < 0 & sFR>base & abs(D_nK)<0.01));
-    
     % spike reverse coupling
-    D_ornV = E_ornV + (S.revCp./(1)).*D_spkV;
+    D_ornV = D_txnV + (S.revCp).*D_spkV;
     
-    
-    pk = ornV.*(ornV > pk) + pk.*(ornV < pk);
 end
 
