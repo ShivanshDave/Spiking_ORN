@@ -54,7 +54,7 @@ function plot_r99f1_currents(DATA)
         nexttile       
         plot(T,real(PRED.Im(:,k)),'-','LineWidth',plt.Lwd);
         set(gca,'ColorOrderIndex',k)
-        axis([-0.1 4 -100 20])
+        axis([-0.1 4 -75 20])
         axis off
     end
     axis on
@@ -98,11 +98,11 @@ function plot_r99_currents(DATA)
         nexttile       
         plot(T,real(PRED.Im(:,k)),'-','LineWidth',plt.Lwd);
         set(gca,'ColorOrderIndex',k)
-        axis([-0.1 4 -100 20])
+%         axis([-0.1 4 -100 20])
         axis off
     end
     axis on
-    axis([-0.1 4 -100 0])
+%     axis([-0.1 4 -100 20])
     set(gca,'YTick', [-100,-50,0],'FontSize',plt.FTsz,...
         'color','none','box', 'off', 'tickdir', 'out')
     xlabel('Time (sec)')
