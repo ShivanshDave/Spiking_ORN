@@ -5,9 +5,9 @@ PULSE.ton = [ 0.2000  2
 PULSE.toff = [1.2000  3 
               1.2000  3
               1.2000  3];
-PULSE.conc = [0  0
+PULSE.conc = [20 5
               5  20
-              20 5];
+              0  0];
 PULSE.tspan = [0 4];
 
 

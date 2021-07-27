@@ -19,7 +19,7 @@ S.revCp = 0.3; % Reverse coupling from spkV to mem.Voltage
 % Ca2+ dependent firing rate modulation 
 S.mCaFR = 1; S.pCaFR = 2; S.nCaFR = 100; %(min,pos,neg)
 S.gIca = 10; % Ca@+ current gain
-S.gIion = 25; % other ion channels activation
+S.gIion = 30; % other ion channels activation
 
 % ML Mem. volt. parameters, adapted from (Anderson et. al., 2015)
 S.vCa = 120;                % Rev.Pot for Calcium channels
