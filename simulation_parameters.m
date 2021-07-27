@@ -12,9 +12,9 @@ P = struct('Sigma',0.0569, 'cap',0.0039, 'cc1lin',0.7750,...
 S = struct;
 
 % Spike properties
-S.spkThr = -43.25; % (ORN_rest=-44) mV
-S.maxFR = 35; % Max firing rate Hz
-S.revCp = 7; % Reverse coupling from spkV to mem.Voltage
+S.spkThr = -43.5; % (ORN_rest=-44) mV
+S.maxFR = 50; % Max firing rate Hz
+S.revCp = 0.3; % Reverse coupling from spkV to mem.Voltage
 
 % Ca2+ dependent firing rate modulation 
 S.mCaFR = 1; S.pCaFR = 2; S.nCaFR = 100; %(min,pos,neg)
@@ -33,3 +33,5 @@ S.Cm  =  20;                % Membrane Conductance
 S.va = -1.2; S.vb = 18;
 % K+ ion channel parameters
 S.vc = 2; S.vd = 30; S.phi_n = 0.04;
+% Current normalizing factor
+S.NF = 70;

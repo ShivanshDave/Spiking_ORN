@@ -14,7 +14,6 @@ init_spkV   = -47.14; %9 ML dV/dt
 init_nk     = 0.04;  %10 ML dN/dt 
 init_CaFR   = 1;     %11 ML d(slope)/dt
 
-
 yinit = {init_bLR, init_aG, init_cAMP, init_Ca,...
         init_CaCAM,init_CAMK,init_IX,init_ornV,...
         init_spkV, init_nk, init_CaFR};
@@ -34,9 +33,8 @@ NCURVE = length(PULSE.ton(:,1));
 NEQ = NVAR*NCURVE;
 JP = spdiags(ones(NEQ,2*NVAR-1),[-(NEQ-NCURVE):NCURVE:(NEQ-NCURVE)],NEQ,NEQ);
 
-% SImulate
-%Solve for 6 seconds so that we may come to a steady-state from our initial conditions.
-tspan = [PULSE.tspan'];
+% Simulate
+tspan = PULSE.tspan';
 ODEOPTS = odeset('JPattern','on','MaxStep',0.9);
 
 tic % start timer
@@ -47,22 +45,24 @@ for j = 1:length(var_names)
     PRED.(var_names{j}) = Y(:,((j-1)*N+1):(j*N));
 end
 
-% Compute currents
+% compute-membrane current
+PRED.Im = P.gl.*(P.vl-PRED.ornV);
+
+% Compute ionic currents
 Incx = [];
 inhcng = 1+(P.inhmax-1).*PRED.CaCaM.^P.ninhcng./(PRED.CaCaM.^P.ninhcng + P.kinhcng.^P.ninhcng);
-%inhcng = 1;
 Icng = (P.cnmax.*PRED.cAMP.^P.n1./(PRED.cAMP.^P.n1 + (inhcng.*P.hmc1).^P.n1)).*(P.vcng-PRED.ornV);
 Icacl = (P.clmax.*PRED.Ca.^P.n2./(PRED.Ca.^P.n2 + P.hmc2.^P.n2)).*(P.vcl-PRED.ornV);
 Il = P.gl.*(P.vl-PRED.ornV);        
 
-% predicted currents
+% predicted ionic currents
 IPRED.PRED_CURRENT = (-Icng - Icacl);
 IPRED.ICNG = -Icng;
 IPRED.ICACL = -Icacl;
 IPRED.INCX = -Incx;
 IPRED.IL = -Il;
 
-% normalized currents
+% normalized ionic currents
 NORMALIZING_FACTOR = 70;
 IPREDn.ICNG = IPRED.ICNG/NORMALIZING_FACTOR;
 IPREDn.ICACL = IPRED.ICACL/NORMALIZING_FACTOR;
@@ -71,11 +71,12 @@ IPREDn.IL = IPRED.IL/NORMALIZING_FACTOR;
 IPREDn.PRED_CURRENT = IPRED.PRED_CURRENT/NORMALIZING_FACTOR;
 IPREDn.NORMALIZING_FACTOR = NORMALIZING_FACTOR;
 
-DATA.PULSE = PULSE;
-DATA.PRED = PRED;
 % DATA.IPRED = IPRED;
 DATA.IPREDn = IPREDn;
 DATA.IPREDn.NF = NORMALIZING_FACTOR;
+
+DATA.PULSE = PULSE;
+DATA.PRED = PRED;
 DATA.T = T;
 DATA.P = P;
 DATA.S = S;
@@ -180,6 +181,5 @@ function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP)
         dy = [D_bLR;D_aG;D_cAMP;D_Ca;...
             D_CaCAM;D_CAMK;D_IX;D_ornV;...
             D_spkV;D_nK;D_CaFR]; 
-
     end
 end
