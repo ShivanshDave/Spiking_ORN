@@ -4,12 +4,9 @@ PULSE.ton = 0.5000*ones(8,1);
 PULSE.toff = 1.5000*ones(8,1);
 PULSE.conc = [300,100,50,20, 10,5,2,1]';
 PULSE.tspan = [0 4];
-
 D.R99.F1 = simulate_ORN(PULSE);
-%%
-plot_currents(D.R99.F1)
-%%
-% plot_adaptation_raw(DATA)
+%% plot
+plot_r99f1_currents(D.R99.F1)
 
 %% Figure-5 (Reisert 1999) Pulse-2, Conc-5 (0,2,5,10)
 PULSE = struct;
@@ -24,33 +21,93 @@ D.R99.F5 = simulate_ORN(PULSE);
 %%
 plot_currents(D.R99.F5)
 
-function plot_currents(DATA)
+function plot_r99f1_currents(DATA)
+
+    plt.Lwd = 1.25;
+    plt.FTsz = 14;
+    plt.Xoff = 0.1;
+    plt.FGpos = [10 10 500 900];
 
     PULSE = DATA.PULSE;
-    IPREDn = DATA.IPREDn;
+    PRED = DATA.PRED;
     T = DATA.T;    
     
-    %%
-
-
-    figure;
+    figure('Position', plt.FGpos);
     np=size(PULSE.ton,2);
     nc=size(PULSE.ton,1);
-    t = tiledlayout(nc,1,'TileSpacing','none','Padding','compact');
+    nstim = 1:length(PULSE.ton(:,1));
+    t = tiledlayout(1+nc,1,'TileSpacing','none','Padding','compact');
+    
+    
+    nexttile
+    TT = linspace(T(1),T(end),100);
+    OD = simulate_pulse_train(TT,PULSE.ton,PULSE.toff,PULSE.conc);
+    OD = OD(end,:);
+    plot(TT,OD,'k-','LineWidth',plt.Lwd);
+    set(gca,'XColor','none','YTick', [0 1], 'YTickLabel', [],...
+        'FontSize',plt.FTsz,...
+        'color','none','box', 'off', 'tickdir', 'out')
+    axis(axis - [plt.Xoff 0 0 0])
+    ylabel({'Conc.','(uM)'})
 
-    Nstim = 1:length(PULSE.ton(:,1));
-    ftSz = 14;
-
-
-    for k = 1:length(Nstim)
-        nexttile;
-        
-        plot(T,real(IPREDn.PRED_CURRENT(:,k)),'-');
+    for k = 1:length(nstim)
+        nexttile       
+        plot(T,real(PRED.Im(:,k)),'-','LineWidth',plt.Lwd);
         set(gca,'ColorOrderIndex',k)
-        ylim([-2 2])
+        axis([-0.1 4 -100 20])
         axis off
-
     end
+    axis on
+    axis([-0.1 4 -100 0])
+    set(gca,'YTick', [-100,-50,0],'FontSize',plt.FTsz,...
+        'color','none','box', 'off', 'tickdir', 'out')
+    xlabel('Time (sec)')
+    ylabel('Current. (pA)')
+end
+
+function plot_r99_currents(DATA)
+
+    plt.Lwd = 1.25;
+    plt.FTsz = 14;
+    plt.Xoff = 0.1;
+    plt.FGpos = [10 10 500 900];
+
+    PULSE = DATA.PULSE;
+    PRED = DATA.PRED;
+    T = DATA.T;    
+    
+    figure('Position', plt.FGpos);
+    np=size(PULSE.ton,2);
+    nc=size(PULSE.ton,1);
+    nstim = 1:length(PULSE.ton(:,1));
+    t = tiledlayout(1+nc,1,'TileSpacing','none','Padding','compact');
+    
+    
+    nexttile
+    TT = linspace(T(1),T(end),100);
+    OD = simulate_pulse_train(TT,PULSE.ton,PULSE.toff,PULSE.conc);
+    OD = OD(end,:);
+    plot(TT,OD,'k-','LineWidth',plt.Lwd);
+    set(gca,'XColor','none','YTick', [0 1], 'YTickLabel', [],...
+        'FontSize',plt.FTsz,...
+        'color','none','box', 'off', 'tickdir', 'out')
+    axis(axis - [plt.Xoff 0 0 0])
+    ylabel({'Conc.','(uM)'})
+
+    for k = 1:length(nstim)
+        nexttile       
+        plot(T,real(PRED.Im(:,k)),'-','LineWidth',plt.Lwd);
+        set(gca,'ColorOrderIndex',k)
+        axis([-0.1 4 -100 20])
+        axis off
+    end
+    axis on
+    axis([-0.1 4 -100 0])
+    set(gca,'YTick', [-100,-50,0],'FontSize',plt.FTsz,...
+        'color','none','box', 'off', 'tickdir', 'out')
+    xlabel('Time (sec)')
+    ylabel('Current. (pA)')
+
    %%
    return;
     ylabel('Normalized Current','Fontsize',ftSz);		

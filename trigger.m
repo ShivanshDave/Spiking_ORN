@@ -20,7 +20,8 @@ clf
 t = tiledlayout(3,2,'TileSpacing','none','Padding','compact');
 
 nexttile
-OD = simulate_pulse_train(TT,PULSE.ton,PULSE.toff,PULSE.conc);
+ TT = linspace(DATA.T(1),DATA.T(end),100);
+ OD = simulate_pulse_train(TT,PULSE.ton,PULSE.toff,PULSE.conc);
 % OD = OD(end,:);
 plot(TT,OD);
 legend(num2str(PULSE.conc))
