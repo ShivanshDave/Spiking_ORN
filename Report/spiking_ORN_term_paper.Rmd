@@ -1,0 +1,106 @@
+---
+title: "Spiking ORN"
+author: |
+  | Shivansh Dave 
+  | Biology Dept., Case Western Reserve University
+  | shivansh@case.edu
+date: |
+  | August 1, 2021
+  | 
+  | *To be submitted as a term paper for BIOL 478 (Spring, 2021)*
+  | *Computational Neuroscience by Dr. Peter J. Thomas*
+
+output: 
+  bookdown::pdf_document2:
+    toc: true
+    toc_depth: 2
+    keep_tex: true
+    number_sections: true
+    extra_dependencies: "subfig"
+
+bibliography: 478_spiking_ORN_modeling.bib
+---
+
+\newpage
+
+```{r global-options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE,fig.align='center') #warning=FALSE, message=FALSE
+```
+
+
+<!-- Text  -->
+# Summary {-}
+
+[@reisert99adaptation] \@ref(fig:myF)
+
+```{r myF, out.width = "50%", fig.cap="TITULO", fig.subcap=c('(a)', '(b)', '(c)')}
+knitr::include_graphics(c('figs/R99_F1.png','figs/R99_F1.png')) 
+```
+
+# Introduction
+
+
+
+# Methods
+
+## ORN operation
+
+### Effect of Concentration
+
+### Effect of duration
+
+### Adaptation
+
+## ML spikes {#ML}
+
+### Ionic currents
+
+### CaFR modulation
+
+## Spike identification
+
+# Results
+
+## Spiking in ORN
+
+### Response to concentration changes
+
+### Response to duration changes
+
+### Response to Adaptation
+
+## Optimal sniffing frequency
+
+### Adaptation vs sniffing frequency
+
+# Discussion and Conclusions {#CD}
+
+1. **res-1.**
+  
+  Figure shows 
+  
+
+\clearpage 
+
+# (APPENDIX) Appendix {-}
+
+
+
+# Appendix A : Single-Run Raw Plots ($\Omega$ and HCO types)
+
+
+
+<!-- \clearpage  -->
+
+# Appendix B : Codes
+
+
+## Matlab code for simulation
+
+simulate_ORN.m
+
+## Other codes
+
+
+# References
+
