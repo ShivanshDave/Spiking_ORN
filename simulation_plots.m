@@ -19,14 +19,14 @@ PULSE.tspan = [-0.5 7];
 
 D.R99.F5 = simulate_ORN(PULSE);
 %%
-plot_currents(D.R99.F5)
+plot_r99_currents(D.R99.F5)
 
 function plot_r99f1_currents(DATA)
 
-    plt.Lwd = 1.25;
+    plt.Lwd = 1.1;
     plt.FTsz = 14;
     plt.Xoff = 0.1;
-    plt.FGpos = [10 10 500 900];
+    plt.FGpos = [10 10 600 900];
 
     PULSE = DATA.PULSE;
     PRED = DATA.PRED;

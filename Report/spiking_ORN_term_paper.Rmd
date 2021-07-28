@@ -1,0 +1,97 @@
+---
+title: "Spiking ORN"
+author: |
+  | Shivansh Dave 
+  | Biology Dept., Case Western Reserve University
+  | shivansh@case.edu
+date: |
+  | August 1, 2021
+  | 
+  | *To be submitted as a term paper for BIOL 478 (Spring, 2021)*
+  | *Computational Neuroscience by Dr. Peter J. Thomas*
+
+output: 
+  bookdown::pdf_document2:
+    toc: true
+    toc_depth: 2
+    keep_tex: true
+    number_sections: true
+    extra_dependencies: "subfig"
+
+bibliography: 478_spiking_ORN_modeling.bib
+---
+
+```{r global-options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE) #warning=FALSE, message=FALSE
+```
+
+<!-- Text  -->
+# Summary {-}
+
+[@reisert99adaptation]
+
+```{r, fig.cap='Figure 1', out.width = "15%",fig.show='hold',fig.cap="TITULO",fig.subcap=c('(a)', '(b)', '(c)')}
+knitr::include_graphics('figs/R99_F1.png') 
+knitr::include_graphics('figs/R99_F1.png') 
+knitr::include_graphics('figs/R99_F1.png') 
+```
+
+# Introduction
+
+
+
+# Methods
+
+
+## ML Neurons {#ML}
+
+
+
+### Stochastic ML Neuron {#MLst}
+
+
+
+## Effect of Current and Noise
+
+Stimulus current would change the output of regular ML neurons and change in system size would affect the noise level in both the types of ML neurons, regular and bursting mode.
+
+### Varying current and system sizeIn plain  ML neurons
+
+
+## Adding Synapse {#syn}
+
+To be able to create a network out of ML neurons, I altered the ML model neurons, once again, to have a chemical synapse of both the inhibitory and excitatory types. Each neuron in the array of network, can be configured separately to receive either no-synapse, inhibitory or excitatory synapses from a desired neuron from the network.
+
+### Activation function
+
+
+### Synaptic current 
+
+
+# Results
+
+
+
+# Discussion and Conclusions {#CD}
+
+1. **Higher binwidth in binless correlation leads to more variabilities and inflated correlation values.**
+  
+  Figure shows correlation comparison for different HCOs computed using various methods in 25 iterations. Firstly, variations of the values across 25 iterations are more when the gaussian kernel used is wider (e.g., W=250, 500, etc.) and 
+
+\clearpage 
+
+# (APPENDIX) Appendix {-}
+
+# Appendix A : Single-Run Raw Plots ($\Omega$ and HCO types)
+
+
+
+\clearpage 
+
+# Appendix B : Codes
+
+## Matlab code for simulation
+
+
+# References
+
