@@ -12,7 +12,7 @@ PULSE.tspan = [0 4];
 
 
 %% RUN
-DATA = simulate_ORN(PULSE);
+DATA = simulate_ORN(PULSE,P,S);
 
 %% Plot
 figure(1);
@@ -28,6 +28,7 @@ legend(num2str(PULSE.conc))
 xlabel('Time (sec)')
 ylabel('Conc. (uM)')
 axis(axis + [0 0 -1 1])
+set(gca,'FontSize',14);
 
 nexttile; 
 plot(DATA.T,real(DATA.PRED.Im))

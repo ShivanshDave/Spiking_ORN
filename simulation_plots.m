@@ -1,3 +1,33 @@
+%% ## ORN operation
+% ### Effect of Concentration ( R99 F2-A )
+script_fig_txn_compare_conc;
+ 
+%% ### Effect of duration
+% % 
+% % ### Adaptation
+% % 
+% % ## ML spikes {#ML}
+% % 
+% % ### Ionic currents
+% % 
+% % ### CaFR modulation
+% % 
+% % ## Spike identification
+% % 
+% % # Results
+% % 
+% % ## Spiking in ORN
+% % 
+% % ### Response to concentration changes
+% % 
+% % ### Response to duration changes
+% % 
+% % ### Response to Adaptation
+% % 
+% % ## Optimal sniffing frequency
+% % 
+% % ### Adaptation vs sniffing frequency
+
 
 %% Figure-1 (Reisert 1999) Pulse-1, Conc-8
 PULSE.ton = 0.5000*ones(8,1);
@@ -5,7 +35,7 @@ PULSE.toff = 1.5000*ones(8,1);
 PULSE.conc = [300,100,50,20, 10,5,2,1]';
 PULSE.tspan = [0 4];
 D.R99.F1 = simulate_ORN(PULSE);
-%% plot
+%% plot pulse and each current
 plot_r99f1_currents(D.R99.F1)
 
 %% Figure-5 (Reisert 1999) Pulse-2, Conc-5 (0,2,5,10)
@@ -21,27 +51,26 @@ D.R99.F5 = simulate_ORN(PULSE);
 %%
 plot_r99_currents(D.R99.F5)
 
-function plot_r99f1_currents(DATA)
+
+
+% plot pulse and each current
+function plot_r99f1_currents(D)
 
     plt.Lwd = 1.1;
     plt.FTsz = 14;
     plt.Xoff = 0.1;
-    plt.FGpos = [10 10 600 900];
-
-    PULSE = DATA.PULSE;
-    PRED = DATA.PRED;
-    T = DATA.T;    
+    plt.FGpos = [10 10 600 900];  
     
     figure('Position', plt.FGpos);
-    np=size(PULSE.ton,2);
-    nc=size(PULSE.ton,1);
-    nstim = 1:length(PULSE.ton(:,1));
+    np=size(D.PULSE.ton,2);
+    nc=size(D.PULSE.ton,1);
+    nstim = 1:length(D.PULSE.ton(:,1));
     t = tiledlayout(1+nc,1,'TileSpacing','none','Padding','compact');
     
     
     nexttile
-    TT = linspace(T(1),T(end),100);
-    OD = simulate_pulse_train(TT,PULSE.ton,PULSE.toff,PULSE.conc);
+    TT = linspace(D.T(1),D.T(end),100);
+    OD = simulate_pulse_train(TT,D.PULSE.ton,D.PULSE.toff,D.PULSE.conc);
     OD = OD(end,:);
     plot(TT,OD,'k-','LineWidth',plt.Lwd);
     set(gca,'XColor','none','YTick', [0 1], 'YTickLabel', [],...
@@ -52,7 +81,7 @@ function plot_r99f1_currents(DATA)
 
     for k = 1:length(nstim)
         nexttile       
-        plot(T,real(PRED.Im(:,k)),'-','LineWidth',plt.Lwd);
+        plot(D.T,real(D.PRED.Im(:,k)),'-','LineWidth',plt.Lwd);
         set(gca,'ColorOrderIndex',k)
         axis([-0.1 4 -75 20])
         axis off
