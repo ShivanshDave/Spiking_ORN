@@ -21,19 +21,20 @@ output:
 bibliography: 478_spiking_ORN_modeling.bib
 ---
 
+\newpage
+
 ```{r global-options, include=FALSE}
-knitr::opts_chunk$set(echo=FALSE) #warning=FALSE, message=FALSE
+knitr::opts_chunk$set(echo=FALSE,fig.align='center') #warning=FALSE, message=FALSE
 ```
+
 
 <!-- Text  -->
 # Summary {-}
 
-[@reisert99adaptation]
+[@reisert99adaptation] \@ref(fig:myF)
 
-```{r, fig.cap='Figure 1', out.width = "15%",fig.show='hold',fig.cap="TITULO",fig.subcap=c('(a)', '(b)', '(c)')}
-knitr::include_graphics('figs/R99_F1.png') 
-knitr::include_graphics('figs/R99_F1.png') 
-knitr::include_graphics('figs/R99_F1.png') 
+```{r myF, out.width = "50%", fig.cap="TITULO", fig.subcap=c('(a)', '(b)', '(c)')}
+knitr::include_graphics(c('figs/R99_F1.png','figs/R99_F1.png')) 
 ```
 
 # Introduction
@@ -42,55 +43,63 @@ knitr::include_graphics('figs/R99_F1.png')
 
 # Methods
 
+## ORN operation
 
-## ML Neurons {#ML}
+### Effect of Concentration
 
+### Effect of duration
 
+### Adaptation
 
-### Stochastic ML Neuron {#MLst}
+## ML spikes {#ML}
 
+### Ionic currents
 
+### CaFR modulation
 
-## Effect of Current and Noise
-
-Stimulus current would change the output of regular ML neurons and change in system size would affect the noise level in both the types of ML neurons, regular and bursting mode.
-
-### Varying current and system sizeIn plain  ML neurons
-
-
-## Adding Synapse {#syn}
-
-To be able to create a network out of ML neurons, I altered the ML model neurons, once again, to have a chemical synapse of both the inhibitory and excitatory types. Each neuron in the array of network, can be configured separately to receive either no-synapse, inhibitory or excitatory synapses from a desired neuron from the network.
-
-### Activation function
-
-
-### Synaptic current 
-
+## Spike identification
 
 # Results
 
+## Spiking in ORN
 
+### Response to concentration changes
+
+### Response to duration changes
+
+### Response to Adaptation
+
+## Optimal sniffing frequency
+
+### Adaptation vs sniffing frequency
 
 # Discussion and Conclusions {#CD}
 
-1. **Higher binwidth in binless correlation leads to more variabilities and inflated correlation values.**
+1. **res-1.**
   
-  Figure shows correlation comparison for different HCOs computed using various methods in 25 iterations. Firstly, variations of the values across 25 iterations are more when the gaussian kernel used is wider (e.g., W=250, 500, etc.) and 
+  Figure shows 
+  
 
 \clearpage 
 
 # (APPENDIX) Appendix {-}
 
+
+
 # Appendix A : Single-Run Raw Plots ($\Omega$ and HCO types)
 
 
 
-\clearpage 
+<!-- \clearpage  -->
 
 # Appendix B : Codes
 
+
 ## Matlab code for simulation
+
+simulate_ORN.m
+
+## Other codes
 
 
 # References

@@ -9,5 +9,4 @@
 *.pdf
 *.tex
 *.Rhistory
-*.Rproj
 Report/MLsync_paper.Rmd
