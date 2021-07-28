@@ -1,3 +1,13 @@
+# Matlab
 *.asv
-\_local*
+/_local*
 *.png
+
+# R
+/figs/*
+.Rproj.user
+*.pdf
+*.tex
+*.Rhistory
+*.Rproj
+Report/MLsync_paper.Rmd
