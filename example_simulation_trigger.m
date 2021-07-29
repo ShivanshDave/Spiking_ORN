@@ -12,7 +12,8 @@ PULSE.tspan = [0 4];
 
 
 %% RUN
-DATA = simulate_ORN(PULSE,P,S);
+SpikeEN=[0;1;0];
+DATA = simulate_ORN(PULSE,SpikeEN);
 
 %% Plot
 figure(1);

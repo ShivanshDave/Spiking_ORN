@@ -3,18 +3,21 @@
 script_fig_txn_compare_conc;
  
 %% ### Effect of duration
-% % 
-% % ### Adaptation
-% % 
-% % ## ML spikes {#ML}
-% % 
-% % ### Ionic currents
-% % 
-% % ### CaFR modulation
-% % 
-% % ## Spike identification
-% % 
-% % # Results
+script_fig_txn_compare_duration; 
+%% ### Adaptation
+script_fig_txn_compare_adaptation;
+
+%% ## ML spikes {#ML}
+% ### CaFR modulation, nK
+script_fig_ML_spikes;
+
+%% Adding ML spikes into ORN Txn
+script_fig_ML_spikes_with_ORN;
+
+%% ## Spike identification
+script_fig_Spike_ID;
+
+%% # Results
 % % 
 % % ## Spiking in ORN
 % % 

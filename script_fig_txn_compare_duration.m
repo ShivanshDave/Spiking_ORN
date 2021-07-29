@@ -1,20 +1,20 @@
-%% R99.F2A
+%% R99.X
 SpikeEN = 0; plt.N = 8;
 PULSE.ton = 0.000*ones(plt.N,1);
-PULSE.toff = 1.00*ones(plt.N,1);
-PULSE.conc = [300,100,50,20,10,5,2,1]';
-PULSE.tspan = [-1 4];
+PULSE.toff = [10,5,2,1, 0.5,0.25,0.1,0.05]';
+PULSE.conc = 20*ones(plt.N,1);
+PULSE.tspan = [-1 12];
 DATA = simulate_ORN(PULSE,SpikeEN);
 
 %%
 plt.Lwd = 1.2;
 plt.FTsz = 16;
-plt.Xoff = 0.1;
+plt.Xoff = 0.25;
 plt.FGpos = [10 10 900 500];
 plt.scale = [3 12 1];
 plt.ytick = [-50,-25,0];
-plt.xtick = -1:4;
-plt.fname = '.\Report\figs\fig_txn_compare_conc.png';
+plt.xtick = [-1,0,1,2,5,10];
+plt.fname = '.\Report\figs\fig_txn_compare_dur.png';
 
 plot_pulse_currents_overlap(plt,DATA)
 %%
@@ -27,13 +27,13 @@ function plot_pulse_currents_overlap(plt,D)
     nexttile([plt.scale(1) 1])
     TT = linspace(D.T(1),D.T(end),100);
     OD = simulate_pulse_train(TT,D.PULSE.ton,D.PULSE.toff,D.PULSE.conc);
-    OD = OD(end,:);
-    plt.ax1 = plot(TT,OD,'k-','LineWidth',plt.Lwd);
+%     OD = OD(end,:);
+    plt.ax1 = plot(TT,OD,'-','LineWidth',plt.Lwd);
     ylabel({'Conc.','(uM)'})
     set(gca,'XLim',plt.X,'XColor','none','XTick', [], 'XTickLabel', [],...
-        'YTick', [0 1], 'YTickLabel', {'0','Var'},'YTickLabelRotation',0,...
+        'YTick', [0 D.PULSE.conc(1)],...
         'tickdir', 'out','FontSize',plt.FTsz,...
-        'color','none','box', 'off')
+        'color','none','box', 'off','ColorOrder',turbo(8))
 
     nexttile([plt.scale(2) 1])
     hold on
@@ -42,8 +42,9 @@ function plot_pulse_currents_overlap(plt,D)
     end
     xlabel('Time (sec)')
     ylabel({'Cell Current','(pA)'})
-    lgd = legend({num2str(D.PULSE.conc)},'Location','best');
-    title(lgd,'Conc. (uM)')    
+    lgd = legend({num2str(D.PULSE.toff)},'NumColumns',2,...
+        'Location','best');
+    title(lgd,'Duration. (Sec)')    
     set(gca,'XLim',plt.X,'XColor','none','XTick',[],'XTickLabel',[],...
         'YLim',[plt.ytick(1) plt.ytick(end)],'YTick',plt.ytick,...
         'tickdir', 'out','FontSize',plt.FTsz,...
