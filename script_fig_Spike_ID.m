@@ -50,9 +50,10 @@ function plot_pulse_spikes(plt,D)
     for k = 1:size(D.PULSE.ton,1)               
         plt.axl(k) = plot(D.T,real(D.PRED.Im(:,k)),'-','LineWidth',plt.Lwd);
     end
-    spikes = script_spikes_ID(real(D.PRED.Im),D.T,-10);
-    i=1; scatter(spikes{i,3}, 1.1*spikes{i,2}, 25, 'b^', 'filled')
-    i=2; scatter(spikes{i,3}, 1.1*spikes{i,2}, 25, 'r^', 'filled')
+    spikes = script_spikes_ID(real(D.PRED.spkV),D.T,0);
+    dind=8; set(gca,'ColorOrderIndex',1);
+    i=1; scatter(D.T(spikes{i,1}-dind), 1.1*real(D.PRED.Im(spikes{i,1}-dind,i)), 25, '^','filled')
+    i=2; scatter(D.T(spikes{i,1}-dind), 1.1*real(D.PRED.Im(spikes{i,1}-dind,i)), 25, '^','filled')
     lgd = legend(plt.lgd,'Location','northeast','NumColumns',2);
     title(lgd,plt.ltitle)
     xlabel('Time (sec)')

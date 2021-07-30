@@ -6,13 +6,13 @@ spikes=cell(sz_X,3);
 for i=1:sz_X
     % Find Peaks
     xval=V(:,i);
-    Fxval = bandpass_filter(xval,1/mean(diff(T)),10,50);
-    [val,index]=LocalMinima(Fxval,3);   
+%     Fxval = bandpass_filter(xval,1/mean(diff(T)),10,50);
+    [val,index]=LocalMaxima(xval);   
     
     % Filter Peaks
     refTh = 10;
-    index(val>spikeThr) = [];          % Apply Vm threshold
-    val(val>spikeThr) = [];
+    index(val<=spikeThr) = [];          % Apply Vm threshold
+    val(val<=spikeThr) = [];
     ind=2; 
     while ind <= length(index)          % Apply refractory period      
        if abs(index(ind)-index(ind-1)) < refTh      
