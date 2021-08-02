@@ -24,9 +24,10 @@ script_fig_Spike_ID;
  script_fig_spk_compare_conc;
 
 %% ### Response to duration changes
-% % 
+script_fig_spk_compare_duration;
+
 %% ### Response to Adaptation
- 
+script_fig_spk_compare_adaptation; 
 %% ## Optimal sniffing frequency
 % % 
 % % ### Adaptation vs sniffing frequency
