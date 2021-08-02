@@ -66,9 +66,10 @@ function plot_pulse_currents_overlap(plt,D)
         'tickdir', 'out','FontSize',plt.FTsz,...
         'color','none','box','off','ColorOrder',hsv(8))
     
-    % CaFR
+    % Ca / CaFR
     nexttile([plt.scale(4) 1])
     hold on
+    yyaxis left
     for k = 1:size(D.PULSE.ton,1)               
         plt.axl(k) = plot(D.T,real(D.PRED.CaFR(:,k)),'-','LineWidth',plt.Lwd);
     end
@@ -79,7 +80,15 @@ function plot_pulse_currents_overlap(plt,D)
     set(gca,'XLim',plt.X,'XColor','none','XTick',[],'XTickLabel',[],...
         'YLim',[1 5],'YTick',[1 5],'YTickLabelRotation',90,...
         'tickdir', 'out','FontSize',plt.FTsz,...
-        'color','none','box','off','ColorOrder',parula(8))
+        'color','none','box','off')
+    
+    yyaxis right
+    plot(D.T,real(D.PRED.Ca(:,k)),'--','LineWidth',plt.Lwd);
+    ylabel('Ca')
+    set(gca,'XLim',plt.X,'XColor','none','XTick',[],'XTickLabel',[],...
+        'YLim',[0 7],'YTick',[0 7],'YTickLabelRotation',90,...
+        'tickdir', 'out','FontSize',plt.FTsz,...
+        'color','none','box','off')
 
     % TIME axis
     nexttile([plt.scale(5) 1])
