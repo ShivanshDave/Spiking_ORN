@@ -10,3 +10,4 @@
 *.tex
 *.Rhistory
 Report/MLsync_paper.Rmd
+*.fig

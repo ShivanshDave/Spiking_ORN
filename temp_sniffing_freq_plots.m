@@ -1,6 +1,6 @@
 %%
-np = 10;
-freq = 0.5;
+np = 5;
+freq = 1;
 SpikeEN = 1; plt.N = 3;
 T=1/freq;
 % Ton = T/3;
@@ -17,7 +17,7 @@ DATA = simulate_ORN(PULSE,SpikeEN);
 % ;
 figure(1);
 clf
-t = tiledlayout(3,2,'TileSpacing','none','Padding','compact');
+t = tiledlayout(3,2,'TileSpacing','tight','Padding','compact');
 
 nexttile
  TT = linspace(DATA.T(1),DATA.T(end),100);

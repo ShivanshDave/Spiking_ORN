@@ -18,7 +18,7 @@ DATA = simulate_ORN(PULSE,SpikeEN);
 %% Plot
 figure(1);
 clf
-t = tiledlayout(3,2,'TileSpacing','none','Padding','compact');
+t = tiledlayout(3,2,'TileSpacing','tight','Padding','compact');
 
 nexttile
  TT = linspace(DATA.T(1),DATA.T(end),100);

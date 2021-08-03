@@ -18,6 +18,10 @@ script_fig_ML_spikes_with_ORN;
 %% ## Spike identification
 script_fig_Spike_ID;
 
+% Different than adding
+% exportgraphics(f,'.\Report\figs\supp_fig_ML_spikes_OVERLAP.png','Resolution',300)
+% without CaFR
+% exportgraphics(f,'.\Report\figs\supp_fig_ML_ID_w_CaFR_1.png','Resolution',300)
 %% # Results
 
 % % ## Spiking in ORN
