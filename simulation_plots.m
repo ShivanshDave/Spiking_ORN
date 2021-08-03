@@ -1,4 +1,5 @@
-%% ## ORN operation
+%% MATLAB B2021a
+% ## ORN operation
 % ### Effect of Concentration ( R99 F2-A )
 script_fig_txn_compare_conc;
  
@@ -20,6 +21,7 @@ script_fig_Spike_ID;
 %% # Results
 
 % % ## Spiking in ORN
+
 %% ### Response to concentration changes
  script_fig_spk_compare_conc;
 
@@ -28,7 +30,10 @@ script_fig_spk_compare_duration;
 
 %% ### Response to Adaptation   << R99.F5 >>
 script_fig_spk_compare_adaptation; 
+
+
 %% ## Optimal sniffing frequency
-% % 
-% % ### Adaptation vs sniffing frequency
+
+% % ### steady-state FR vs sniffing frequency
+script_fig_sniff_freq_FRss; 
 

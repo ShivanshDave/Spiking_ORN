@@ -21,7 +21,7 @@ plot_pulse_currents_overlap(plt,DATA)
 function plot_pulse_currents_overlap(plt,D)
 
     figure('Renderer', 'painters', 'Position', plt.FGpos);
-    plt.t = tiledlayout(sum(plt.scale),1,'TileSpacing','normal','Padding','compact');
+    plt.t = tiledlayout(sum(plt.scale),1,'TileSpacing','loose','Padding','compact');
     plt.X = [D.PULSE.tspan(1)-plt.Xoff, D.PULSE.tspan(2)];
     
     %-- Stim --

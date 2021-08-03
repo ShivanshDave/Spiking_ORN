@@ -57,7 +57,7 @@ function plot_pulse_spikes(plt,D)
     lgd = legend(plt.lgd,'Location','northeast','NumColumns',2);
     title(lgd,plt.ltitle)
     xlabel('Time (sec)')
-    ylabel('I_{M} (pA)')
+    ylabel('I_{ORN} (pA)')
 
     set(gca,'XLim',plt.X,'XColor','none','XTick',[],'XTickLabel',[],...
         'YLim',[plt.ytick(1) plt.ytick(end)],'YTick',plt.ytick,...

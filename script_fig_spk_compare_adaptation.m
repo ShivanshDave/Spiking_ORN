@@ -4,17 +4,17 @@ PULSE.ton = [0 4].*ones(plt.N,1);
 PULSE.toff = [4 5].*ones(plt.N,1);
 PULSE.conc(:,1) = flip([10,5,1.75,0]');
 PULSE.conc(:,2) = 20*ones(plt.N,1);
-PULSE.tspan = [-0.5 6.5];
+PULSE.tspan = [-0.25 6];
 DATA = simulate_ORN(PULSE,SpikeEN);
 
 %%
 plt.Lwd = 1.2;
 plt.FTsz = 16;
 plt.Xoff = 0.1;
-plt.FGpos = [10 10 900 700];
+plt.FGpos = [10 10 900 600];
 plt.scale = [3 4 1];
 plt.ytick = [-50,0,20];
-plt.xtick = [0 2 4 5 6.5];
+plt.xtick = [0 2 4 6];
 plt.tspan = PULSE.tspan;
 plt.fname = '.\Report\figs\fig_spk_compare_adaptation.png';
 
@@ -45,16 +45,15 @@ function plot_pulse_currents(plt, D)
         nexttile([plt.scale(2) 1])       
         plt.axl(k) = plot(D.T,real(D.PRED.Im(:,k)),'-',...
             'LineWidth',plt.Lwd,'Color',clr(k,:));
-        text(plt.tspan(1),25,[num2str(D.PULSE.conc(k,1)),' \muM'],...
-            'HorizontalAlignment','left','FontSize',plt.FTsz,'Color',clr(k,:))
+        text(plt.tspan(1),-10,[num2str(D.PULSE.conc(k,1)),' \muM'],...
+            'HorizontalAlignment','left','FontSize',plt.FTsz-1,'Color',clr(k,:))
         set(gca,'XLim',plt.X,'XColor','none','XTick',[],'XTickLabel',[],...
             'YLim',[plt.ytick(1) plt.ytick(end)],...
             'YColor','none','YTick',[],'YTickLabel',[],...
             'tickdir','out','FontSize',plt.FTsz,...
-            'color','none','box','off')
-        
+            'color','none','box','off')   
     end
-    ylabel({'I_M (pA)'})
+    ylabel({'I_{ORN} (pA)'})
     set(gca,'XLim',plt.X,'XColor','none','XTick',[],'XTickLabel',[],...
         'YLim',[plt.ytick(1) plt.ytick(end)],...
         'YColor',[0.1500 0.1500 0.1500],'YTick',plt.ytick,...

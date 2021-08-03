@@ -1,12 +1,12 @@
 %%
 np = 10;
-freq = 0.1;
+freq = 0.5;
 SpikeEN = 1; plt.N = 3;
 T=1/freq;
-
+% Ton = T/3;
 %%
 PULSE.ton = T*(0:np-1).*ones(plt.N,1);
-PULSE.toff = T/2+T*(0:np-1).*ones(plt.N,1);
+PULSE.toff = round(T/3,1) + T*(0:np-1).*ones(plt.N,1);
 PULSE.conc = [5,20,100]'.*ones(1,np).*ones(plt.N,1);
 PULSE.tspan = [-T 11*T];
 %%

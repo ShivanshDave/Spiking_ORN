@@ -27,6 +27,7 @@ function plot_pulse_currents(plt, D)
         'TileSpacing','none','Padding','compact');
     plt.X = [D.PULSE.tspan(1)-plt.Xoff, D.PULSE.tspan(2)];
     
+    % STIM
     nexttile([plt.scale(1) 1])
     TT = linspace(D.T(1),D.T(end),100);
     OD = simulate_pulse_train(TT,D.PULSE.ton,D.PULSE.toff,D.PULSE.conc);
@@ -38,12 +39,13 @@ function plot_pulse_currents(plt, D)
         'tickdir', 'out','FontSize',plt.FTsz,...
         'color','none','box', 'off')
     
+    % SPK
     clr = turbo(nc).*0.75;
     for k = 1:nc
         nexttile([plt.scale(2) 1])       
         plt.axl(k) = plot(D.T,real(D.PRED.Im(:,k)),'-',...
             'LineWidth',plt.Lwd,'Color',clr(k,:));
-        text(D.PULSE.tspan(2),20,[num2str(D.PULSE.conc(k)),' \muM'],...
+        text(D.PULSE.tspan(2),-15,[num2str(D.PULSE.conc(k)),' \muM'],...
             'HorizontalAlignment','right','FontSize',plt.FTsz,'Color',clr(k,:))
         set(gca,'XLim',plt.X,'XColor','none','XTick',[],'XTickLabel',[],...
             'YLim',[plt.ytick(1) plt.ytick(end)],...
@@ -52,14 +54,15 @@ function plot_pulse_currents(plt, D)
             'color','none','box','off')
         
     end
-    ylabel({'I_M (pA)'})
+    ylabel({'I_{ORN} (pA)'})
     set(gca,'XLim',plt.X,'XColor','none','XTick',[],'XTickLabel',[],...
         'YLim',[plt.ytick(1) plt.ytick(end)],...
         'YColor',[0.1500 0.1500 0.1500],'YTick',plt.ytick,...
         'YTickLabel',{plt.ytick(1),'',plt.ytick(end)},...
         'tickdir', 'out','FontSize',plt.FTsz,...
         'color','none','box','off')
-
+    
+    % X ax
     nexttile([plt.scale(3) 1])
     axis();
     xlabel('Time (sec)')
