@@ -2,12 +2,13 @@
 *.asv
 /_local*
 *.png
+*.fig
 
-# R
+# R - Report
 /figs/*
 .Rproj.user
 *.pdf
 *.tex
 *.Rhistory
-Report/MLsync_paper.Rmd
-*.fig
+**/*_cache/*
+**/*_files/*

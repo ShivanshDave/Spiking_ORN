@@ -34,7 +34,7 @@ knitr::opts_chunk$set(echo=FALSE,fig.align='center') #warning=FALSE, message=FAL
 [@reisert99adaptation] \@ref(fig:myF)
 
 ```{r myF, out.width = "50%", fig.cap="TITULO", fig.subcap=c('(a)', '(b)', '(c)')}
-knitr::include_graphics(c('figs/R99_F1.png','figs/R99_F1.png')) 
+knitr::include_graphics(c('figs/old/R99_F1.png','figs/old//R99_F1.png')) 
 ```
 
 # Introduction
@@ -43,11 +43,40 @@ knitr::include_graphics(c('figs/R99_F1.png','figs/R99_F1.png'))
 
 # Methods
 
+```{r dott-ex, engine = "dot", fig.cap = "Funky dot", cache=TRUE}
+digraph test2 {
+  graph [layout = dot, rankdir = TB]
+
+  node [shape = rectangle]
+  rec1 [label = "Step 1. Wake up"]
+  rec2 [label = "Step 2. Write code"]
+  rec3 [label =  "Step 3. ???"]
+  rec4 [label = "Step 4. PROFIT"]
+
+  rec1 -> rec2 -> rec3 -> rec4
+  }
+```
+
 ## ORN operation
 
 ### Effect of Concentration
 
 ### Effect of duration
+
+```{r dot-ex, engine = "dot", fig.cap = "Funky dot", cache=TRUE, out.width = "90%"}
+digraph test123 {
+  a -> b -> c;
+  a -> {x y};
+  b [shape=box];
+  c [label="hello\nworld",color=blue,fontsize=24,
+      fontname="Palatino-Italic",fontcolor=red,style=filled];
+  a -> z [label="hi", weight=100];
+  x -> z [label="multi-line\nlabel"];
+  edge [style=dashed,color=red];
+  b -> x;
+  {rank=same; b x}
+}
+```
 
 ### Adaptation
 
