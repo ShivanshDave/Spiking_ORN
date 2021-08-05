@@ -39,7 +39,7 @@ tnow = tnow(:);
 if nargin == 5
 	SHARPNESS = varargin{1};
 else
-	SHARPNESS = 0; % 0.001; 
+	SHARPNESS = 1e-10; % 0.001; 
 end
 
 NTP = length(tnow);

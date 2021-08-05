@@ -10,7 +10,7 @@ P = struct('Sigma',0.0569, 'cap',0.0039, 'cc1lin',0.7750,...
 
 %% ML Spike sytem co-eff
 S = struct;
-
+S.SpikeEN = 1; % EN=1, DL=0
 % Spike properties
 S.spkThr = -43; % (ORN_rest=-44) mV
 S.maxFR = 50; % Max firing rate Hz

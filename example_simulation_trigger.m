@@ -12,12 +12,13 @@ PULSE.tspan = [0 4];
 
 
 %% RUN
-DATA = simulate_ORN(PULSE);
+SpikeEN=[0;1;0];
+DATA = simulate_ORN(PULSE,SpikeEN);
 
 %% Plot
 figure(1);
 clf
-t = tiledlayout(3,2,'TileSpacing','none','Padding','compact');
+t = tiledlayout(3,2,'TileSpacing','tight','Padding','compact');
 
 nexttile
  TT = linspace(DATA.T(1),DATA.T(end),100);
@@ -28,6 +29,7 @@ legend(num2str(PULSE.conc))
 xlabel('Time (sec)')
 ylabel('Conc. (uM)')
 axis(axis + [0 0 -1 1])
+set(gca,'FontSize',14);
 
 nexttile; 
 plot(DATA.T,real(DATA.PRED.Im))

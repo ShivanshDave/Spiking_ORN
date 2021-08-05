@@ -1,7 +1,16 @@
-function DATA = simulate_ORN(PULSE) 
-% Initialize
-simulation_parameters;
+function DATA = simulate_ORN(PULSE,SpikeEN,P,S) 
 
+if ~exist('S','var') || ~exist('P','var')
+    simulation_parameters;
+end
+
+if exist('SpikeEN','var')
+    S.SpikeEN = SpikeEN;
+else
+    S.SpikeEN = 1;
+end
+
+% Initialize
 init_bLR    = 1.e-8; %1
 init_aG     = 1.e-8; %2
 init_cAMP   = 1.e-8; %3
@@ -169,7 +178,7 @@ function dy = SYSTEM(t,y,ODEOPTS,PULSE,P,S,N,JP)
         % Other ion channels activation
         Iion = S.gIion*(ornV>S.spkThr); % nA Thr@vL=(88,-60),(57,-44)    
 
-        D_spkV = (ct/S.Cm).*( Iion + Ica ... 
+        D_spkV = S.SpikeEN.*(ct/S.Cm).*( Iion + Ica ... 
             - S.gL*(spkV-S.vL) ... 
             - S.gK*nK.*(spkV-S.vK) ...
             - S.gCa*minf(spkV).*(spkV-S.vCa) );
