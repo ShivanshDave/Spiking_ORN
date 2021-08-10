@@ -18,6 +18,99 @@ plt.fname = '.\Report\figs\fig_spk_compare_conc.png';
 
 plot_pulse_currents(plt,DATA)
 
+%% << F-3 >>
+plt.Lwd = 1.2;
+plt.FTsz = 14;
+plt.Xoff = 0.1;
+plt.FGpos = [10 10 600 900];
+plt.scale = [0 5 0];
+plt.ytick = [-50,-25,0];
+plt.xtick = -1:4;
+plt.fname = '.\Report\figs\fig_spk_compare_conc_quant.png';
+
+plot_spk_quantify(plt,DATA)
+%%
+function plot_spk_quantify(plt,DATA)
+
+    figure('Renderer', 'painters', 'Position', plt.FGpos);
+    plt.t = tiledlayout(3*sum(plt.scale),1,'TileSpacing','tight','Padding','compact');
+    
+    
+    %%
+    spikes = script_spikes_ID(real(DATA.PRED.spkV),DATA.T,0);
+    %%
+    spk_t = spikes(:,3);
+    idx = ~cellfun('isempty',spk_t);
+    spk_freq = zeros(size(spk_t));
+    spk_count = zeros(size(spk_t));
+    spk_latency = nan(size(spk_t));
+    
+    spk_latency(idx) = cellfun(@(v)v(1),spk_t(idx));
+    spk_count(idx) = cellfun(@(v) length(v),spk_t(idx));
+    spk_freq(idx) = cellfun(@(v) v(end)-v(1),spk_t(idx));
+    spk_freq(idx) = spk_count(idx)./spk_freq(idx);
+    
+    
+    
+    sz = 100;
+    %% A - Freq
+    nexttile([plt.scale(2) 1])
+    hold on
+%     plot(DATA.PULSE.conc, real(max(DATA.PRED.Im)),'k--')
+        yyaxis right
+    plot(DATA.PULSE.conc, real(min(DATA.PRED.Im)),'--')
+    scatter(DATA.PULSE.conc, real(min(DATA.PRED.Im)),sz,0.75*turbo(8),'filled','s')
+    ylabel({'Cell Current (pA)'})
+    set(gca,'XColor','none','XTick', [], 'XTickLabel', [],...
+        'xscale','log','tickdir', 'out','FontSize',plt.FTsz,...
+        'color','none','box','off','YDir','reverse')
+    
+        yyaxis left
+    plot(DATA.PULSE.conc, spk_freq,'-')
+    scatter(DATA.PULSE.conc, spk_freq,sz,0.75*turbo(8),'s','LineWidth',1.5)
+    ylabel({'Frequency (Hz)'})
+%     xlabel('Concentration (uM)')
+    
+    set(gca,'XColor','none','XTick', [], 'XTickLabel', [],...
+        'xscale','log','tickdir', 'out','FontSize',plt.FTsz,...
+        'color','none','box','off')
+    
+    %% B - Spk count
+    nexttile([plt.scale(2) 1])
+    hold on
+    plot(DATA.PULSE.conc, spk_count,'-','Color',[0 0.4470 0.7410])
+    scatter(DATA.PULSE.conc, spk_count, sz,0.75*turbo(8),'o','LineWidth',1.5)
+    ylabel({'Number of Spikes'})
+%     xlabel('Concentration (uM)')
+    
+    set(gca,'XColor','none','XTick', [], 'XTickLabel', [],...
+        'YColor',[0 0.4470 0.7410],'xscale','log','tickdir', 'out','FontSize',plt.FTsz,...
+        'color','none','box','off')
+    
+    %% C - Spk latency
+    nexttile([plt.scale(2) 1])
+    hold on
+        yyaxis right
+    [~,id] = min(DATA.PRED.Im);
+    plot(DATA.PULSE.conc, DATA.T(id),'--')
+    scatter(DATA.PULSE.conc, DATA.T(id),sz,0.75*turbo(8),'filled','^')
+    ylabel({'Time to paek (sec)'})
+    ylim([0 1.2])
+        yyaxis left
+    plot(DATA.PULSE.conc, spk_latency,'k-')
+    scatter(DATA.PULSE.conc, spk_latency, sz,0.75*turbo(8),'s','LineWidth',1.5)
+    ylabel({'Latency (sec)'})
+    ylim([0 1.2])
+        
+    
+    xlabel('Concentration (uM)')
+    set(gca,'xscale','log','tickdir', 'out','FontSize',plt.FTsz,...
+        'color','none','box','off')
+
+    %%
+    exportgraphics(gcf,plt.fname,'Resolution',300)
+end
+
 % plot pulse and each current
 function plot_pulse_currents(plt, D)
 

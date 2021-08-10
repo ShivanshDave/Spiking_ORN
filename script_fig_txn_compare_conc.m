@@ -6,7 +6,7 @@ PULSE.conc = [300,100,50,20,10,5,2,1]';
 PULSE.tspan = [-1 4];
 DATA = simulate_ORN(PULSE,SpikeEN);
 
-%%
+%% << F2A >>
 plt.Lwd = 1.2;
 plt.FTsz = 16;
 plt.Xoff = 0.1;
@@ -17,7 +17,42 @@ plt.xtick = -1:4;
 plt.fname = '.\Report\figs\fig_txn_compare_conc.png';
 
 plot_pulse_currents_overlap(plt,DATA)
+%% << F2B >>
+plt.Lwd = 1.2;
+plt.FTsz = 16;
+plt.Xoff = 0.1;
+plt.FGpos = [10 10 700 500];
+plt.scale = [0 15 0];
+plt.ytick = [-50,-25,0];
+plt.xtick = -1:4;
+plt.fname = '.\Report\figs\fig_txn_compare_conc_quant.png';
+
+plot_pulse_quantify(plt,DATA)
 %%
+function plot_pulse_quantify(plt,DATA)
+
+    figure('Renderer', 'painters', 'Position', plt.FGpos);
+    plt.t = tiledlayout(sum(plt.scale),1,'TileSpacing','tight','Padding','compact');
+    
+    %%
+    [~,ix]=min(abs(DATA.T-1.5));
+    sz = 100;
+    nexttile([plt.scale(2) 1])
+    hold on
+    plot(DATA.PULSE.conc, real(max(DATA.PRED.Im)),'k--')
+    scatter(DATA.PULSE.conc, real(max(DATA.PRED.Im)),sz,0.75*turbo(8),'s','LineWidth',1.5)
+    plot(DATA.PULSE.conc, real(DATA.PRED.Im(ix,:)),'k-')
+    scatter(DATA.PULSE.conc, real(DATA.PRED.Im(ix,:)),sz,0.75*turbo(8),'filled','s')
+    text(100,-42,'Peak Current','FontSize',plt.FTsz-2)
+    text(100,-17,'Plateau Current','FontSize',plt.FTsz-2)
+    xlabel('Concentration (uM)')
+    ylabel({'Cell Current (pA)'})
+    set(gca,'xscale','log','YDir','reverse','tickdir', 'out','FontSize',plt.FTsz,...
+        'color','none','box','off')
+    %%
+    exportgraphics(gcf,plt.fname,'Resolution',300)
+end
+
 function plot_pulse_currents_overlap(plt,D)
 
     figure('Renderer', 'painters', 'Position', plt.FGpos);
