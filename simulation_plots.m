@@ -35,6 +35,8 @@ script_fig_spk_compare_duration;
 %% ### Response to Adaptation   << R99.F5 >>
 script_fig_spk_compare_adaptation; 
 
+%% All together
+script_fig_spk_all_comps;
 
 %% ## Optimal sniffing frequency
 
