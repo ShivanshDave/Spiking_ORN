@@ -40,17 +40,19 @@ end
 %% FIND FR
 D.FRss = nan(length(D.conc),length(D.test_frq));
 D.FRmx = D.FRss;
+D.num_spk_ss = D.FRss;
+D.num_spk_mx = D.FRss;
 
 for f=1:length(D.test_frq)
     Dspk = D.(['f',num2str(D.test_frq(f))]);    
     % LAST
     dur_stim = [Dspk.PULSE.ton(end),Dspk.PULSE.toff(end)];
-    spk_count = cellfun(@(v) sum(v>=dur_stim(1) & v<=dur_stim(2)), Dspk.spk(:,3)); 
-    D.FRss(:,f) = spk_count/diff(dur_stim);
+    D.num_spk_ss(:,f) = cellfun(@(v) sum(v>=dur_stim(1) & v<=dur_stim(2)), Dspk.spk(:,3)); 
+    D.FRss(:,f) = D.num_spk_ss(:,f)/diff(dur_stim);
     %FIRST
     dur_stim = [Dspk.PULSE.ton(1),Dspk.PULSE.toff(1)];
-    spk_count = cellfun(@(v) sum(v>=dur_stim(1) & v<=dur_stim(2)), Dspk.spk(:,3)); 
-    D.FRmx(:,f) = spk_count/diff(dur_stim);
+    D.num_spk_mx(:,f) = cellfun(@(v) sum(v>=dur_stim(1) & v<=dur_stim(2)), Dspk.spk(:,3)); 
+    D.FRmx(:,f) = D.num_spk_mx(:,f)/diff(dur_stim);
 end
 
 %%
@@ -71,7 +73,7 @@ disp('---DONE---')
 
 
 function plot_freq_FRss(plt,D)
-    %%
+    %% INFORMATION GAIN
     figure('Renderer', 'painters', 'Position', plt.FGpos);
     plt.t = tiledlayout(2*plt.scale(1),1,'TileSpacing','tight','Padding','tight');
     plt.X = [D.test_frq(1)-plt.Xoff, D.test_frq(end)];
@@ -107,7 +109,47 @@ function plot_freq_FRss(plt,D)
         
 
     linkaxes(plt.ax(:),'x')    
-    exportgraphics(gcf,[plt.fname '.png'],'Resolution',300)
+    exportgraphics(gcf,[plt.fname '_gain.png'],'Resolution',300)
+    
+    
+    %% COUNT
+    figure('Renderer', 'painters', 'Position', plt.FGpos);
+    plt.t = tiledlayout(2*plt.scale(1),1,'TileSpacing','tight','Padding','tight');
+    plt.X = [D.test_frq(1)-plt.Xoff, D.test_frq(end)];
+    plt.ax = [];
+
+    % FR Max - First stim
+    plt.ax(end+1) = nexttile([plt.scale(1) plt.scale(2)]);
+    plot(D.test_frq, D.num_spk_mx,'LineWidth',plt.Lwd)
+    hold on
+    set(gca,'ColorOrderIndex',1)
+    scatter(D.test_frq, D.num_spk_mx,75,'^')
+    % xlabel('Time (sec)')
+    ylabel('Peak Spike-count')
+    set(gca,'XLim',plt.X,'XColor','none','XTick', [], 'XTickLabel', [],...
+            'YTickLabelRotation',0,...
+            'tickdir', 'out','FontSize',plt.FTsz,...
+            'color','none','box', 'off')
+
+    % FR ss - Last stim
+    plt.ax(end+1) = nexttile([plt.scale(1) plt.scale(2)]);
+    plot(D.test_frq, D.num_spk_ss,'LineWidth',plt.Lwd)
+    hold on
+    set(gca,'ColorOrderIndex',1)
+    scatter(D.test_frq, D.num_spk_ss,75,'^')
+    xlabel('Breathing frequency (bpm)')
+    ylabel('Steady-state Spike-count')
+    lgd = legend({num2str(D.conc)},'Location','best');
+    title(lgd,'Conc. (uM)') 
+    set(gca,'XLim',plt.X,...
+            'YTickLabelRotation',0,...
+            'tickdir', 'out','FontSize',plt.FTsz,...
+            'color','none','box', 'off')
+        
+
+    linkaxes(plt.ax(:),'x')    
+    exportgraphics(gcf,[plt.fname '_raw.png'],'Resolution',300)
+    
 
 end
 
