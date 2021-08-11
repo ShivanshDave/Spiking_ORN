@@ -1,0 +1,44 @@
+digraph spiking_ORN {
+	rankdir=X;
+	size="15"
+	node [shape = doublecircle, color=red]; "Stim", "I_ORN";
+	node [shape = circle, color=blue];
+
+	subgraph clusterB {
+		node [style=filled, color=pink];
+		label = "Morris-Leccar spikes";
+		color=blue;
+        "nK" -> "V_ML" [label = "", arrowhead="inv"];
+		"V_ML" -> "V_ML" [label = "gLml", arrowhead="odot"];
+		"CaFR" -> "V_ML" [label = "", arrowhead="odot"];
+    }
+
+	"Stim" -> "bLR" [label = "k1", arrowhead="inv"];
+	"bLR" -> "bLR" [label = "r1", arrowhead="odot"];
+	"bLR" -> "aG" [label = "k2", arrowhead="inv"];
+	"aG" -> "aG" [label = "r2", arrowhead="odot"];
+	"aG" -> "cAMP" [label = "", arrowhead="inv"];
+	"cAMP" -> "cAMP" [label = "pd", arrowhead="odot"];
+	"cAMP" -> "CNG" [label = "", arrowhead="inv"];
+	"CNG" -> "Ca^2+" [label = "", arrowhead="inv"];
+	"CNG" -> "Ca^2+" [label = "", arrowhead="inv"];
+	"CNG" -> "Ca^2+" [label = "", arrowhead="inv"];
+	"Ca^2+" -> "Ca^2+" [label = "Jncx", arrowhead="odot"];
+	"Ca^2+" -> "Ca^2+" [label = "cc1 lin", arrowhead="odot"];
+	"Ca^2+" -> "CaCaM" [label = "cc1 lin", arrowhead="inv"];
+	"CaCaM" -> "CaCaM" [label = "cc2", arrowhead="odot"];
+	"CaCaM" -> "CNG" [label = "cc2", arrowhead="odot"];
+	"CaCaM" -> "aCaMK" [label = "ck1 lin", arrowhead="inv"];
+	"aCaMK" -> "aCaMK" [label = "ck2", arrowhead="odot"];
+	"aCaMK" -> "cAMP" [label = "", arrowhead="odot"];
+	"CaCaM" -> "Ca^2+" [label = "cc2", arrowhead="inv"];
+	"Ca^2+" -> "Vm" [label = "Incx", arrowhead="inv"];
+	"Ca^2+" -> "Vm" [label = "Icl(ca)", arrowhead="inv"];
+	"Vm" -> "CNG" [label = "", arrowhead="inv"];
+	"Vm" -> "Vm" [label = "gL", arrowhead="odot"];
+	"CNG" -> "Vm" [label = "Icng", arrowhead="inv"];
+	"V_ML" -> "Vm" [label = "", arrowhead="inv"];
+	"Vm" -> "nK" [label = "", arrowhead="inv"];
+	"Ca^2+" -> "CaFR" [label = "", arrowhead="inv"];
+	"Vm" -> "I_ORN" [label = "", arrowhead="inv"];
+	}

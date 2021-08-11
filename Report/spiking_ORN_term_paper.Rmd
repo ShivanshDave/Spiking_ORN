@@ -37,7 +37,53 @@ knitr::opts_chunk$set(echo=FALSE,fig.align='center') #warning=FALSE, message=FAL
 knitr::include_graphics(c('figs/old/R99_F1.png','figs/old//R99_F1.png')) 
 ```
 
+# ALL EQUATIONS
+
+
+\begin{equation} 
+\frac{d \mathbf{CaFR}}{dt} = (1+\mathbf{Ca})*(p(d\mathbf{Ca} > 0) - n(d\mathbf{Ca}<0\  \& \ d\mathbf{CaFR} > m)) \notag
+\end{equation} 
+
+
+\begin{align} 
+\frac{d \mathbf{V_{ML}}}{dt} =& \frac{ct*\mathbf{CaFR}}{C_m}(I_{ions} + I_{Ca} \notag \\
+&- gL(\mathbf{V_{ML}-V_L}) - gK*\mathbf{nK}*(\mathbf{V_{ML}-V_K}) \notag \\
+&- gCa*M_{\infty}*(\mathbf{V_{ML}-V_{Ca}}) \ ) \notag \\
+\frac{d \mathbf{nK}}{dt} =& \frac{{ct*\mathbf{CaFR}}*(n_{\infty}(\mathbf{V_{ML}}) - \mathbf{nK})}{\tau(\mathbf{V_{ML})}}  \notag
+\end{align} 
+
+\begin{align}
+\nonumber \phi=0.04\ s^{-1},\ v_a&=-1.2\ mV,\ v_b=18\ mV,\ v_c=2\ mV,\ v_d=30\ mV, \notag \\
+\xi = \frac{v-v_c}{v_d},\ 
+    &\alpha(v) = \frac{\phi \cosh(\xi/2)}{1+ e^{2\xi}},\ 
+    \beta(v) = \frac{\phi \cosh(\xi/2)}{1+ e^{-2\xi}}, \notag \\
+n_\infty(v) &= \frac{\alpha(v)}{\alpha(v) + \beta(v)} \ 
+    =\  \frac12(1 + \tanh \xi) \notag \\
+m_\infty &= \frac12\left(1+ \tanh(\frac{v-v_a}{vb})\right) \notag \\ 
+\tau(v) &= \frac{1}{\alpha(v) + \beta(v)} \ 
+    =\  \frac{1}{\phi \cosh(\xi/2)}
+\end{align}
+
+\begin{equation} (\#eq:par)
+\begin{split}
+&v_{\rm Ca} = 120\ mV,\  v_{\rm K} = -84\ mV,\ v_{\rm L} = -60\ mV,
+\\ &g_{\rm Ca} = 4.4\ m\mho/cm^2, \ g_{K\rm } = 8\ m\mho/cm^2,\ 
+    g_{\rm L} = 2\ m\mho/cm^2,
+\\ &C = 20\ \mu F/cm^2,\ I_{\rm app} = (variable;\ measured\ in\ 
+    \mu A/cm^2) 
+\end{split} \notag
+\end{equation}
+
+
+
+
+
+
 # Introduction
+
+
+
+
 
 
 
