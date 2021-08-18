@@ -10,7 +10,7 @@ DATA = simulate_ORN(PULSE,SpikeEN);
 plt.Lwd = 1.2;
 plt.FTsz = 16;
 plt.Xoff = 0.1;
-plt.FGpos = [10 10 900 500];
+plt.FGpos = [10 10 900 600];
 plt.scale = [3 12 1];
 plt.ytick = [-50,-25,0];
 plt.xtick = -1:4;
@@ -21,7 +21,7 @@ plot_pulse_currents_overlap(plt,DATA)
 plt.Lwd = 1.2;
 plt.FTsz = 16;
 plt.Xoff = 0.1;
-plt.FGpos = [10 10 700 500];
+plt.FGpos = [10 10 900 500];
 plt.scale = [0 15 0];
 plt.ytick = [-50,-25,0];
 plt.xtick = -1:4;

@@ -16,42 +16,178 @@ output:
     toc_depth: 2
     keep_tex: true
     number_sections: true
-    extra_dependencies: "subfig"
+    extra_dependencies: ["subfig"]
+    
+header-includes:
+  \usepackage{float}
 
 bibliography: 478_spiking_ORN_modeling.bib
 ---
-
-\newpage
 
 ```{r global-options, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE,fig.align='center') #warning=FALSE, message=FALSE
 ```
 
+\newpage
+\floatplacement{figure}{!htb}
 
 <!-- Text  -->
 # Summary {-}
 
-[@reisert99adaptation] \@ref(fig:myF)
+[@reisert99adaptation] 
 
-```{r myF, out.width = "50%", fig.cap="TITULO", fig.subcap=c('(a)', '(b)', '(c)')}
-knitr::include_graphics(c('figs/old/R99_F1.png','figs/old//R99_F1.png')) 
+
+
+# Introduction
+
+
+
+
+
+\clearpage
+
+# Methods
+
+## Spiking ORN model
+
+> add arrow notations
+
+```{r model, engine = "dot", fig.cap = "Spiking ORN mechanistic model diagram", cache=TRUE}
+digraph spiking_ORN {
+	rankdir=LR;
+	node [shape = doublecircle, color=red, width=1,fontsize=20]; O_stim, I_ORN;
+	node [color=blue]; Ca;
+	node [shape = circle, style=unfilled, color=blue];
+	edge [color=black];
+
+	subgraph clusterB {
+		node [style=filled, color=pink];
+		edge [color=red];
+		label = "Morris-Lecar spikes";
+		fontsize = 20;
+		fontcolor=red;
+		color=blue;
+		nK -> V_ML[label = gK, arrowhead=odot];
+		V_ML -> V_ML [label = "gCa - gL"];
+		CaFR -> V_ML [label = "Ica",headport=ne];
+		CaFR -> nK [label = "ct" , arrowhead=odot];
+		V_ML -> nK [label = "tau"];
+		{rank = max nK}
+		{rank = same CaFR V_ML}
+    }
+
+	O_stim -> bLR [label = k1, headport=nw];
+	bLR -> bLR [label = r1, arrowhead=odot];
+	bLR -> aG [label = k2];
+	aG -> aG [label = r2, arrowhead=odot];
+	aG -> cAMP [label = synth];
+	aCaMK -> cAMP [label = synth, arrowhead=odot,headport=nw];
+	cAMP -> cAMP [label = pd, arrowhead=odot];
+	CaCaM -> aCaMK [label = ck1];
+	aCaMK -> aCaMK [label = ck2, arrowhead=odot];
+	CaCaM -> CaCaM [label = cc2, arrowhead=odot];
+	Ca -> CaCaM [label = cc1, headport=se];	
+	Ca -> Ca [label = cc1, arrowhead=odot];	
+	CaCaM -> Ca [label = cc2, headport=nw];
+
+	Ca -> IX [label = cx1];
+	IX -> IX [label = cx2, arrowhead=odot];
+	IX -> Ca [label = Jncx, arrowhead=odot];
+
+	cAMP -> Ca [label = Icng];
+	cAMP -> V_ORN [label = Icng, headport=nw];
+	V_ORN -> V_ORN [label = gl, arrowhead=odot];
+	Ca -> V_ORN [label="Icl(ca)", headport=ne];
+	V_ORN -> I_ORN [label = gl];
+	V_ORN -> V_ML [dir=both, label = Iions];
+	Ca -> CaFR [label = "dCa"];
+
+	{rank = min bLR O_stim I_ORN}
+	{rank = same cAMP aCaMK V_ORN}
+	{rank = same Ca CaCaM}
+}
 ```
 
-# ALL EQUATIONS
+- *O_stim* : Odor stimulus
+- *bLR* : Ligand-bound receptors
+- *aG* : Active-state G-proteins
+- *cAMP* : Cyclic adenosine monophosphate (AMP)
+- *Ca^2+* : cytosolic free $Ca^{2+}$ ions
+- *CaCaM* : $Ca^{2+}$-calmodulin
+- *aCaMK* : active state of *CaCaM* dependent protein kinase (CaMK)
+- *V_ORN* : 
+- *V_ML* : 
+- *nK* : 
+- *CaFR* : 
+- *I_ORN* : 
 
+
+## ORN operation
+
+Ligand-receptor binding
+G-protein activation
 
 \begin{equation} 
-\frac{d \mathbf{CaFR}}{dt} = (1+\mathbf{Ca})*(p(d\mathbf{Ca} > 0) - n(d\mathbf{Ca}<0\  \& \ d\mathbf{CaFR} > m)) \notag
+\begin{split}
+O_{stim} = od \cdot [ H(t-t_0) - H(t-t_1) ];\ \ \ \ \  \text{(single pulse)}  \\
+\frac{d \mathbf{bLR}}{dt} = k1 \cdot O_{stim} \cdot (Rtot - \mathbf{bLR}) - r1 \cdot \mathbf{bLR} \\
+\frac{d \mathbf{aG}}{dt} = k2 \cdot \mathbf{bLR} \cdot (Gtot - \mathbf{aG}) - r2 \cdot \mathbf{aG} \\
+\end{split}
 \end{equation} 
 
+- *H*(.) - Heaviside step function, *od* odor-concentration
 
+Intracellular signalling
+
+\begin{equation} 
+\begin{split}
+\frac{d \mathbf{cAMP}}{dt} = synth - pd \cdot \mathbf{cAMP} \\
+synth =  \frac{\mathbf{aG} \cdot smax}{1 + (\mathbf{aCaMK} / kinh )^{ninh}} \\
+\frac{d \mathbf{CaCaM}}{dt} = cc1 \cdot \mathbf{Ca} - cc2 \cdot \mathbf{CaCaM} \\
+\frac{d \mathbf{aCaMK}}{dt} = ck1 \cdot \mathbf{CaCaM} - ck2 \cdot \mathbf{aCaMK} \\
+\frac{d \mathbf{Ca}}{dt} = inf\cdot I_{CNG} - ef \cdot \mathbf{Ca} - (cc1 \cdot \mathbf{Ca} - cc2 \cdot \mathbf{CaCaM}) \\
+I_{CNG} = \frac {cnmax\cdot \mathbf{cAMP}^{n_1}\cdot (vcng - V_{ORN})}
+{\mathbf{cAMP}^{n_1} + (inhcng\cdot hmc_1)^{n_1}}, \\
+inhcng = 1 + \frac {(inhmax-1)\cdot \mathbf{CaCaM}^{ninhcng}}
+{\mathbf{CaCaM}^{ninhcng} + kinhcng^{ninhcng}}
+\end{split}
+\end{equation} 
+
+\begin{equation} 
+\begin{split}
+\frac{d \mathbf{V_{ORN}}}{dt} = \frac{1}{cap} \cdot (\ I_{CNG} + I_{Cl(Ca)} + I_{leak}\ )\\
+I_{Cl(Ca)} = \frac{clmax\cdot \mathbf{Ca}^{n_2}\cdot (vcl - \mathbf{V_{ORN}})}
+{\mathbf{Ca}^{n_2} + hmc_2^{n_2}} \\
+I_{leak} = \text{gl}\cdot (vl - \mathbf{V_{ORN}})
+\end{split}
+\end{equation} 
+
+> FIG : Conc/Adap
+
+## ML spikes {#ML}
+
+<!-- ML : V & nK -->
 \begin{align} 
-\frac{d \mathbf{V_{ML}}}{dt} =& \frac{ct*\mathbf{CaFR}}{C_m}(I_{ions} + I_{Ca} \notag \\
-&- gL(\mathbf{V_{ML}-V_L}) - gK*\mathbf{nK}*(\mathbf{V_{ML}-V_K}) \notag \\
-&- gCa*M_{\infty}*(\mathbf{V_{ML}-V_{Ca}}) \ ) \notag \\
-\frac{d \mathbf{nK}}{dt} =& \frac{{ct*\mathbf{CaFR}}*(n_{\infty}(\mathbf{V_{ML}}) - \mathbf{nK})}{\tau(\mathbf{V_{ML})}}  \notag
+\frac{d \mathbf{V_{ML}}}{dt} =& \frac{ct \cdot \mathbf{CaFR}}{C_m}
+( I_{ions} + I_{Ca} - gL(\mathbf{V_{ML}}-v_L) \notag \\
+&- gK \cdot \mathbf{nK} \cdot (\mathbf{V_{ML}}-v_K) 
+- gCa \cdot M_{\infty} \cdot (\mathbf{V_{ML}}-v_{Ca}) \ ) \notag \\
+\frac{d \mathbf{nK}}{dt} =& \frac{{ct \cdot \mathbf{CaFR}} 
+[ n_{\infty}(\mathbf{V_{ML}}) - \mathbf{nK} ]} {\tau(\mathbf{V_{ML})}}  \notag
 \end{align} 
 
+<!-- ML : V_ORN vales -->
+\begin{equation} (\#eq:par)
+\begin{split}
+&v_{\rm Ca} = 120\ mV,\  v_{\rm K} = -84\ mV,\ v_{\rm L} = -60\ mV,
+\\ &g_{\rm Ca} = 4.4\ m\mho/cm^2, \ g_{K\rm } = 8\ m\mho/cm^2,\ 
+    g_{\rm L} = 2\ m\mho/cm^2,
+\\ &C = 20\ \mu F/cm^2,\ I_{\rm app} = (variable;\ measured\ in\ 
+    \mu A/cm^2) 
+\end{split} \notag
+\end{equation}
+
+<!-- ML : functions -->
 \begin{align}
 \nonumber \phi=0.04\ s^{-1},\ v_a&=-1.2\ mV,\ v_b=18\ mV,\ v_c=2\ mV,\ v_d=30\ mV, \notag \\
 \xi = \frac{v-v_c}{v_d},\ 
@@ -64,89 +200,85 @@ m_\infty &= \frac12\left(1+ \tanh(\frac{v-v_a}{vb})\right) \notag \\
     =\  \frac{1}{\phi \cosh(\xi/2)}
 \end{align}
 
-\begin{equation} (\#eq:par)
-\begin{split}
-&v_{\rm Ca} = 120\ mV,\  v_{\rm K} = -84\ mV,\ v_{\rm L} = -60\ mV,
-\\ &g_{\rm Ca} = 4.4\ m\mho/cm^2, \ g_{K\rm } = 8\ m\mho/cm^2,\ 
-    g_{\rm L} = 2\ m\mho/cm^2,
-\\ &C = 20\ \mu F/cm^2,\ I_{\rm app} = (variable;\ measured\ in\ 
-    \mu A/cm^2) 
-\end{split} \notag
-\end{equation}
+### CaFR modulation
 
-
-
-
-
-
-# Introduction
-
-
-
-
-
-
-
-# Methods
-
-```{r dott-ex, engine = "dot", fig.cap = "Funky dot", cache=TRUE}
-digraph test2 {
-  graph [layout = dot, rankdir = TB]
-
-  node [shape = rectangle]
-  rec1 [label = "Step 1. Wake up"]
-  rec2 [label = "Step 2. Write code"]
-  rec3 [label =  "Step 3. ???"]
-  rec4 [label = "Step 4. PROFIT"]
-
-  rec1 -> rec2 -> rec3 -> rec4
-  }
-```
-
-## ORN operation
-
-### Effect of Concentration
-
-### Effect of duration
-
-```{r dot-ex, engine = "dot", fig.cap = "Funky dot", cache=TRUE, out.width = "90%"}
-digraph test123 {
-  a -> b -> c;
-  a -> {x y};
-  b [shape=box];
-  c [label="hello\nworld",color=blue,fontsize=24,
-      fontname="Palatino-Italic",fontcolor=red,style=filled];
-  a -> z [label="hi", weight=100];
-  x -> z [label="multi-line\nlabel"];
-  edge [style=dashed,color=red];
-  b -> x;
-  {rank=same; b x}
-}
-```
-
-### Adaptation
-
-## ML spikes {#ML}
+<!-- CaFR -->
+\begin{equation} 
+\frac{d \mathbf{CaFR}}{dt} = (1+\mathbf{Ca})*(p(d\mathbf{Ca} > 0) - n(d\mathbf{Ca}<0\  \& \ d\mathbf{CaFR} > m)) \notag
+\end{equation} 
 
 ### Ionic currents
 
-### CaFR modulation
 
-## Spike identification
+### ML spikes added in ORN
+
+> Add spike-marks
+
+```{r MLspkORN, out.width = "80%", fig.cap="Resuling ORN current due to Morris-Lecar spikes"}
+knitr::include_graphics(c('figs/v1/fig_ML_spikes_with_ORN.png')) 
+```
+
+> Add spike-marks
+
+```{r rORN, out.width = "80%", fig.cap="Spiking ORN operation and key underlying component traces"}
+knitr::include_graphics(c('figs/v1/fig_spk_all_components.png')) 
+```
+
+
+## Sniffing experiment
+
+### odor stimulus
+diff Breaths/min and diff concentration
+
+
+\clearpage
 
 # Results
 
 ## Spiking in ORN
 
+
 ### Response to concentration changes
+
+```{r rCon, out.width = "80%", fig.cap="Resulting spiking ORN for different concentrations"}
+knitr::include_graphics(c('figs/v1/fig_spk_compare_conc.png')) 
+```
+
+*ORN Spike-response profiling*
+
+```{r MLquant, out.width = "80%", fig.cap="ORN spike-response profiling for different stimulus concentrations"}
+knitr::include_graphics(c('figs/v1/fig_spk_compare_conc_quant.png')) 
+```
 
 ### Response to duration changes
 
+Does not affect much, indicates adaptation
+
 ### Response to Adaptation
+
+```{r rAdp, out.width = "80%", fig.cap="Effect of adaptation on ORN spiking"}
+knitr::include_graphics(c('figs/v1/fig_spk_compare_adaptation.png')) 
+```
+
+Does affect. Hypothesis : longer inter-stim interval will cause lesser adaptation than shorter-intervals
 
 ## Optimal sniffing frequency
 
-### Adaptation vs sniffing frequency
+Number of spikes during the first-sniff vs steady-state
+
+```{r , out.width = "80%", fig.cap="Count"}
+knitr::include_graphics(c('figs/v1/fig_sniff_freq_FR_tuning_raw.png')) 
+```
+
+### ORN sensitivity vs sniffing frequency
+
+Spike-count / stimulus-duration
+
+Adaptation vs sniffing frequency
+
+```{r , out.width = "80%", fig.cap="Adap"}
+knitr::include_graphics(c('figs/v1/fig_sniff_freq_FR_tuning_gain.png')) 
+```
 
 # Discussion and Conclusions {#CD}
 
@@ -160,22 +292,113 @@ digraph test123 {
 # (APPENDIX) Appendix {-}
 
 
+# Appendix A : Comparing experimental data with simulation {-}
 
-# Appendix A : Single-Run Raw Plots ($\Omega$ and HCO types)
+## ORN transduction {-}
 
+### Varying odor-concentration 
 
+```{r r99f2, out.width = "80%", fig.cap="Receptor current responses of an olfactory receptor cell (Fig-2; Reisert 1999)"}
+knitr::include_graphics('figs/Reisert1999/fig_txn_compare_conc_quant_R99_F2.png') 
+```
 
-<!-- \clearpage  -->
+\@ref(fig:TxConAB)
 
-# Appendix B : Codes
+```{r TxConAB, out.width = "80%", fig.cap="Transduction comparison for various odor concentration", fig.subcap=c('Cell current raw traces', 'Quantification', '(c)'), fig.sep='\\par'}
+knitr::include_graphics(c('figs/v1/fig_txn_compare_conc.png','figs/v1/fig_txn_compare_conc_quant.png')) 
+```
 
+### Effect of adaptation
 
-## Matlab code for simulation
+```{r r99f4, out.width = "80%", fig.cap="The effect of adaptation on the odour-induced receptor current (Fig-4; Reisert 1999)"}
+knitr::include_graphics('figs/Reisert1999/fig_txn_compare_adaptation_R99_F4.png') 
+```
+
+```{r TxAdp, out.width = "80%", fig.cap="Transduction comparison for adaptation"}
+knitr::include_graphics(c('figs/v1/fig_txn_compare_adaptation.png')) 
+```
+
+### Effect of stimulus duration
+
+```{r TxDur, out.width = "80%", fig.cap="Transduction comparison for various odor durations"}
+knitr::include_graphics(c('figs/v1/fig_txn_compare_dur.png')) 
+```
+
+```{r rDur, out.width = "80%", fig.cap="Spiking ORN response for stimulus duration"}
+knitr::include_graphics(c('figs/v1/fig_spk_compare_dur.png')) 
+```
+
+## Spikes in ORN {-}
+
+### Experimental data
+
+```{r r99f1, out.width = "80%", fig.cap="Responses of an olfactory receptor cell to odour stimuli of increasing concentration recorded with the suction pipette technique (Fig-1; Reisert 1999)"}
+knitr::include_graphics('figs/Reisert1999/fig_spk_compare_conc_R99_F1.png') 
+```
+
+```{r r99f5, out.width = "80%", fig.cap="The effect of adaptation on the odour-induced spike firing response (Fig-5; Reisert 1999)"}
+knitr::include_graphics('figs/Reisert1999/fig_spk_compare_adaptation_R99_F5.png') 
+```
+
+```{r r99f3, out.width = "80%", fig.cap="Collected dose-response data from six cells (Fig-3; Reisert 1999)"}
+knitr::include_graphics('figs/Reisert1999/fig_spk_compare_conc_quant_R99_F3.png') 
+```
+
+### Spike identification
+
+```{r MLspkID, out.width = "80%", fig.cap="Identifying ML-spikes to indicate an event responses of various stimulus concentrations"}
+knitr::include_graphics(c('figs/v1/fig_ML_spikes_ID.png')) 
+```
+
+### Effect of CaFR
+
+```{r MLspk, out.width = "80%", fig.cap="Altered Morris-Lecar model for action potentials in ORN"}
+knitr::include_graphics(c('figs/v1/fig_ML_spikes.png')) 
+```
+
+```{r aCaFR1, out.width = "80%", fig.cap="Simulations with keeping CaFR=1 for the entire duration"}
+knitr::include_graphics(c('figs/Appendix/supp_fig_ML_ID_w_CaFR_1.png')) 
+```
+
+### Differences in adding  Morris-Lecar dynamics
+
+```{r MLover, out.width = "80%", fig.cap="Simulations with ML integrated into molecular process (top) and added ML-spikes separately post-simulation (bottom)"}
+knitr::include_graphics(c('figs/Appendix/supp_fig_ML_spikes_OVERLAP.png')) 
+```
+
+\clearpage
+
+# Appendix B : Sniffing-simulation plots {-}
+
+```{r f10bpm, out.width = "80%", fig.cap="Sniffing at 10 breaths/min over-all"}
+knitr::include_graphics(c('figs/sniff/fig_spk_sniffing_10bpm.png')) 
+```
+
+```{r f10bpmSS, out.width = "80%", fig.cap="Sniffing at 10 breaths/min : steady-state response zoom-in"}
+knitr::include_graphics(c('figs/sniff/fig_spk_sniffing_10bpm_last.png')) 
+```
+
+```{r f35bpm, out.width = "80%", fig.cap="Sniffing at 35 breaths/min over-all"}
+knitr::include_graphics(c('figs/sniff/fig_spk_sniffing_35bpm.png')) 
+```
+
+```{r f50bpm, out.width = "80%", fig.cap="Sniffing at 50 breaths/min over-all"}
+knitr::include_graphics(c('figs/sniff/fig_spk_sniffing_50bpm.png')) 
+```
+
+\clearpage
+
+# Appendix C : Codes {-}
+
+## Matlab simulation {-}
 
 simulate_ORN.m
 
-## Other codes
+## All other codes {-}
 
+- All Matlab simulation script, Matlab scripts for all figures, tex/md files for generating this report and figures files are available here : 
+  + <[Google Drive](https://drive.google.com/drive/folders/1N4nMSW9fY1oOydNJQu4aa85tXOV_euu4?usp=sharing)>
+  + <[github.com/shivanshdave](https://drive.google.com/drive/folders/1N4nMSW9fY1oOydNJQu4aa85tXOV_euu4?usp=sharing)>
 
 # References
 

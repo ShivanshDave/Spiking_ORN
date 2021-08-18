@@ -3,15 +3,15 @@
 /_local*
 *.png
 *.fig
+*.mat
+*.jpg
+*.svg
 
 # R - Report
-/figs/*
 .Rproj.user
 *.pdf
 *.tex
 *.Rhistory
 **/*_cache/*
 **/*_files/*
-*.mat
-*.svg
-*.jpg
+Report/term_paper.Rmd
