@@ -2,7 +2,7 @@
 title: "Spiking ORN"
 author: |
   | Shivansh Dave 
-  | Biology Dept., Case Western Reserve University
+  | Biology Department, Case Western Reserve University
   | shivansh@case.edu
 date: |
   | August 1, 2021
@@ -52,60 +52,9 @@ knitr::opts_chunk$set(echo=FALSE,fig.align='center') #warning=FALSE, message=FAL
 
 > add arrow notations
 
-```{r model, engine = "dot", fig.cap = "Spiking ORN mechanistic model diagram", cache=TRUE}
-digraph spiking_ORN {
-	rankdir=LR;
-	node [shape = doublecircle, color=red, width=1,fontsize=20]; O_stim, I_ORN;
-	node [color=blue]; Ca;
-	node [shape = circle, style=unfilled, color=blue];
-	edge [color=black];
 
-	subgraph clusterB {
-		node [style=filled, color=pink];
-		edge [color=red];
-		label = "Morris-Lecar spikes";
-		fontsize = 20;
-		fontcolor=red;
-		color=blue;
-		nK -> V_ML[label = gK, arrowhead=odot];
-		V_ML -> V_ML [label = "gCa - gL"];
-		CaFR -> V_ML [label = "Ica",headport=ne];
-		CaFR -> nK [label = "ct" , arrowhead=odot];
-		V_ML -> nK [label = "tau"];
-		{rank = max nK}
-		{rank = same CaFR V_ML}
-    }
+```{r model, engine="dot", code=xfun::read_utf8('spiking_ORN_model.gv'), out.width="110%", fig.cap="Spiking ORN mechanistic model diagram", cache=TRUE}
 
-	O_stim -> bLR [label = k1, headport=nw];
-	bLR -> bLR [label = r1, arrowhead=odot];
-	bLR -> aG [label = k2];
-	aG -> aG [label = r2, arrowhead=odot];
-	aG -> cAMP [label = synth];
-	aCaMK -> cAMP [label = synth, arrowhead=odot,headport=nw];
-	cAMP -> cAMP [label = pd, arrowhead=odot];
-	CaCaM -> aCaMK [label = ck1];
-	aCaMK -> aCaMK [label = ck2, arrowhead=odot];
-	CaCaM -> CaCaM [label = cc2, arrowhead=odot];
-	Ca -> CaCaM [label = cc1, headport=se];	
-	Ca -> Ca [label = cc1, arrowhead=odot];	
-	CaCaM -> Ca [label = cc2, headport=nw];
-
-	Ca -> IX [label = cx1];
-	IX -> IX [label = cx2, arrowhead=odot];
-	IX -> Ca [label = Jncx, arrowhead=odot];
-
-	cAMP -> Ca [label = Icng];
-	cAMP -> V_ORN [label = Icng, headport=nw];
-	V_ORN -> V_ORN [label = gl, arrowhead=odot];
-	Ca -> V_ORN [label="Icl(ca)", headport=ne];
-	V_ORN -> I_ORN [label = gl];
-	V_ORN -> V_ML [dir=both, label = Iions];
-	Ca -> CaFR [label = "dCa"];
-
-	{rank = min bLR O_stim I_ORN}
-	{rank = same cAMP aCaMK V_ORN}
-	{rank = same Ca CaCaM}
-}
 ```
 
 - *O_stim* : Odor stimulus
@@ -114,7 +63,7 @@ digraph spiking_ORN {
 - *cAMP* : Cyclic adenosine monophosphate (AMP)
 - *Ca^2+* : cytosolic free $Ca^{2+}$ ions
 - *CaCaM* : $Ca^{2+}$-calmodulin
-- *aCaMK* : active state of *CaCaM* dependent protein kinase (CaMK)
+- *aCaMK* : active state of *CaCaM*-dependent protein kinase (CaMK)
 - *V_ORN* : 
 - *V_ML* : 
 - *nK* : 
@@ -129,38 +78,47 @@ G-protein activation
 
 \begin{equation} 
 \begin{split}
-O_{stim} = od \cdot [ H(t-t_0) - H(t-t_1) ];\ \ \ \ \  \text{(single pulse)}  \\
-\frac{d \mathbf{bLR}}{dt} = k1 \cdot O_{stim} \cdot (Rtot - \mathbf{bLR}) - r1 \cdot \mathbf{bLR} \\
-\frac{d \mathbf{aG}}{dt} = k2 \cdot \mathbf{bLR} \cdot (Gtot - \mathbf{aG}) - r2 \cdot \mathbf{aG} \\
+O_{\text{stim}} &= \text{od} \cdot [ H(t-t_0) - H(t-t_1) ];\ \ \ \ \  \text{(single pulse)}  \\
+\frac{d\ \mathbf{bLR}}{dt} &= \text{k1} \cdot O_{\text{stim}} \cdot (\text{Rtot} - \mathbf{bLR}) - \text{r1} \cdot \mathbf{bLR} \\
+\frac{d\ \mathbf{aG}}{dt} &= \text{k2} \cdot \mathbf{bLR} \cdot (\text{Gtot} - \mathbf{aG}) - \text{r2} \cdot \mathbf{aG}
 \end{split}
-\end{equation} 
+\end{equation}
 
-- *H*(.) - Heaviside step function, *od* odor-concentration
+- **_H_(.)** - Heaviside step function, **od** odor-concentration
 
 Intracellular signalling
 
-\begin{equation} 
+\begin{equation}
 \begin{split}
-\frac{d \mathbf{cAMP}}{dt} = synth - pd \cdot \mathbf{cAMP} \\
-synth =  \frac{\mathbf{aG} \cdot smax}{1 + (\mathbf{aCaMK} / kinh )^{ninh}} \\
-\frac{d \mathbf{CaCaM}}{dt} = cc1 \cdot \mathbf{Ca} - cc2 \cdot \mathbf{CaCaM} \\
-\frac{d \mathbf{aCaMK}}{dt} = ck1 \cdot \mathbf{CaCaM} - ck2 \cdot \mathbf{aCaMK} \\
-\frac{d \mathbf{Ca}}{dt} = inf\cdot I_{CNG} - ef \cdot \mathbf{Ca} - (cc1 \cdot \mathbf{Ca} - cc2 \cdot \mathbf{CaCaM}) \\
-I_{CNG} = \frac {cnmax\cdot \mathbf{cAMP}^{n_1}\cdot (vcng - V_{ORN})}
-{\mathbf{cAMP}^{n_1} + (inhcng\cdot hmc_1)^{n_1}}, \\
-inhcng = 1 + \frac {(inhmax-1)\cdot \mathbf{CaCaM}^{ninhcng}}
-{\mathbf{CaCaM}^{ninhcng} + kinhcng^{ninhcng}}
+\frac{d\ \mathbf{cAMP}}{dt} &= synth - pd \cdot \mathbf{cAMP} \\
+\frac{d\ \mathbf{Ca}}{dt} &= \text{inf}\cdot I_{\text{CNG}} - J_{\text{NCX}} - (\text{cc1} \cdot \mathbf{Ca} - \text{cc2} \cdot \mathbf{CaCaM}) \\
+\frac{d\ \mathbf{CaCaM}}{dt} &= \text{cc1} \cdot \mathbf{Ca} - \text{cc2} \cdot \mathbf{CaCaM} \\
+\frac{d\ \mathbf{aCaMK}}{dt} &= \text{ck1} \cdot \mathbf{CaCaM} - \text{ck2} \cdot \mathbf{aCaMK}
 \end{split}
-\end{equation} 
+\end{equation}
 
-\begin{equation} 
+\begin{equation}
 \begin{split}
-\frac{d \mathbf{V_{ORN}}}{dt} = \frac{1}{cap} \cdot (\ I_{CNG} + I_{Cl(Ca)} + I_{leak}\ )\\
-I_{Cl(Ca)} = \frac{clmax\cdot \mathbf{Ca}^{n_2}\cdot (vcl - \mathbf{V_{ORN}})}
-{\mathbf{Ca}^{n_2} + hmc_2^{n_2}} \\
-I_{leak} = \text{gl}\cdot (vl - \mathbf{V_{ORN}})
+\frac{d\ \mathbf{IX}}{dt} &= \text{cx1} \cdot \mathbf{Ca} - \text{cx2} \cdot \mathbf{IX} \\
+synth &= \frac{\mathbf{aG} \cdot \text{smax}}{1 + (\mathbf{aCaMK} / \text{kinh} )^{\text{ninh}}} \\
+&J_{\text{NCX}} = \text{ef}\cdot \mathbf{Ca}/[1+(\mathbf{IX}/\text{kI})^{\text{nI}}] \\
 \end{split}
-\end{equation} 
+\end{equation}
+
+Effector Channel Activity / Receptor Currents
+
+\begin{equation}
+\begin{split}
+\frac{d\ \mathbf{V_{ORN}}}{dt} &= \frac{1}{\text{cap}} \cdot (\ I_{\text{CNG}} + I_{\text{Cl(Ca)}} + I_{\text{leak}}\ ) \\
+I_{\text{CNG}} &= \frac{\text{cnmax} \cdot \mathbf{cAMP}^{\text{n}_1} \cdot (\text{vcng}-\mathbf{V_{ORN}})}{\mathbf{cAMP}^{\text{n}_1} + (inhcng \cdot \text{hmc}_1)^{\text{n}_1}} \\
+inhcng &= 1 + \frac{(\text{inhmax}-1)\cdot \mathbf{CaCaM}^{\text{ninhcng}}}{\mathbf{CaCaM}^{\text{ninhcng}} + \text{kinhcng}^{\text{ninhcng}}} \\
+I_{\text{Cl(Ca)}} &= \frac{\text{clmax}\cdot \mathbf{Ca}^{\text{n}_2}\cdot (\text{vcl} - \mathbf{V_{ORN}})}{\mathbf{Ca}^{\text{n}_2} + \text{hmc}_2^{\text{n}_2}} \\
+I_{\text{leak}} &= \text{gl}\cdot (\text{vl} - \mathbf{V_{ORN}})
+\end{split}
+\end{equation}
+
+
+
 
 > FIG : Conc/Adap
 
@@ -168,12 +126,10 @@ I_{leak} = \text{gl}\cdot (vl - \mathbf{V_{ORN}})
 
 <!-- ML : V & nK -->
 \begin{align} 
-\frac{d \mathbf{V_{ML}}}{dt} =& \frac{ct \cdot \mathbf{CaFR}}{C_m}
-( I_{ions} + I_{Ca} - gL(\mathbf{V_{ML}}-v_L) \notag \\
-&- gK \cdot \mathbf{nK} \cdot (\mathbf{V_{ML}}-v_K) 
-- gCa \cdot M_{\infty} \cdot (\mathbf{V_{ML}}-v_{Ca}) \ ) \notag \\
-\frac{d \mathbf{nK}}{dt} =& \frac{{ct \cdot \mathbf{CaFR}} 
-[ n_{\infty}(\mathbf{V_{ML}}) - \mathbf{nK} ]} {\tau(\mathbf{V_{ML})}}  \notag
+\frac{d\ \mathbf{V_{ML}}}{dt} =& \frac{ct \cdot \mathbf{CaFR}}{C_m}( I_{ions} + I_{Ca} - gL(\mathbf{V_{ML}}-v_L) \notag \\
+&- gK \cdot \mathbf{nK} \cdot (\mathbf{V_{ML}}-v_K) - gCa \cdot M_{\infty} \cdot (\mathbf{V_{ML}}-v_{Ca}) \ ) \notag \\
+\frac{d\ \mathbf{nK}}{dt} =& \frac{{ct \cdot \mathbf{CaFR}} 
+[ n_{\infty}(\mathbf{V_{ML}}) - \mathbf{nK} ]}{\tau(\mathbf{V_{ML})}}  \notag
 \end{align} 
 
 <!-- ML : V_ORN vales -->

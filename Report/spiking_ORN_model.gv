@@ -1,9 +1,11 @@
 digraph spiking_ORN {
 	rankdir=LR;
-	node [shape = doublecircle, color=red, width=1,fontsize=20]; O_stim, I_ORN;
-	node [color=blue]; Ca;
-	node [shape = circle, style=unfilled, color=blue];
+	node [shape = doublecircle, color=red, width=0.7,fontsize=15]; O_stim, I_ORN;
+	node [shape = doublecircle, color=blue, width=1,fontsize=20]; Ca;
+	node [shape = circle, color=blue, width=0, fontsize=15]; IX;
+	node [shape = circle, color=blue, width=1,fontsize=20,style=unfilled];
 	edge [color=black];
+	
 
 	subgraph clusterB {
 		node [style=filled, color=pink];
@@ -44,14 +46,12 @@ digraph spiking_ORN {
 	V_ORN -> V_ORN [label = gl, arrowhead=odot];
 	Ca -> V_ORN [label="Icl(ca)", headport=ne];
 	V_ORN -> I_ORN [label = gl];
-	V_ORN -> V_ML [dir=both, label = Iions];
 	Ca -> CaFR [label = "dCa"];
-
+	V_ORN -> V_ML [dir=both, label=gIons, taillabel="revCp"];
 
 	{rank = min bLR O_stim I_ORN}
 	{rank = same cAMP aCaMK V_ORN}
 	{rank = same Ca CaCaM}
-	
-
 }
 
+// dot -Tpng -Gdpi=300 model.gv -o model.png
