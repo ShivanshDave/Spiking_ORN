@@ -1,9 +1,9 @@
 digraph spiking_ORN {
 	rankdir=LR;
 	node [shape = doublecircle, color=red, width=0.7,fontsize=15]; O_stim, I_ORN;
-	node [shape = doublecircle, color=blue, width=1,fontsize=20]; Ca;
+	node [shape = doublecircle, color=blue, width=1,fontsize=18]; Ca;
 	node [shape = circle, color=blue, width=0, fontsize=15]; IX;
-	node [shape = circle, color=blue, width=1,fontsize=20,style=unfilled];
+	node [shape = circle, color=blue, width=1,fontsize=18,style=unfilled];
 	edge [color=black];
 	
 
@@ -15,10 +15,10 @@ digraph spiking_ORN {
 		fontcolor=red;
 		color=blue;
 		nK -> V_ML[label = gK, arrowhead=odot];
-		V_ML -> V_ML [label = "gCa - gL"];
-		CaFR -> V_ML [label = "Ica",headport=ne];
-		CaFR -> nK [label = "ct" , arrowhead=odot];
+		CaFR -> V_ML [arrowhead="odot",label = "ct",headport="ne"];
+		CaFR -> nK [label = "ct", arrowhead=odot];
 		V_ML -> nK [label = "tau"];
+		V_ML -> V_ML [label = "gCa - gL"];
 		{rank = max nK}
 		{rank = same CaFR V_ML}
     }
@@ -39,7 +39,7 @@ digraph spiking_ORN {
 
 	Ca -> IX [label = cx1];
 	IX -> IX [label = cx2, arrowhead=odot];
-	IX -> Ca [label = Jncx, arrowhead=odot];
+	IX -> Ca [label = Jncx, arrowhead=odot,headport=ne];
 
 	cAMP -> Ca [label = Icng];
 	cAMP -> V_ORN [label = Icng, headport=nw];
@@ -47,11 +47,12 @@ digraph spiking_ORN {
 	Ca -> V_ORN [label="Icl(ca)", headport=ne];
 	V_ORN -> I_ORN [label = gl];
 	Ca -> CaFR [label = "dCa"];
-	V_ORN -> V_ML [dir=both, label=gIons, taillabel="revCp"];
+	V_ORN -> V_ML [dir=both, label=gIons, taillabel="  revCp"];
+	Ca -> V_ML [label = "Ica"];
 
 	{rank = min bLR O_stim I_ORN}
 	{rank = same cAMP aCaMK V_ORN}
 	{rank = same Ca CaCaM}
 }
 
-// dot -Tpng -Gdpi=300 model.gv -o model.png
+// dot -Tpng -Gdpi=300 spiking_ORN_model.gv -o .\figs\model.png

@@ -57,18 +57,24 @@ knitr::opts_chunk$set(echo=FALSE,fig.align='center') #warning=FALSE, message=FAL
 
 ```
 
-- *O_stim* : Odor stimulus
-- *bLR* : Ligand-bound receptors
-- *aG* : Active-state G-proteins
-- *cAMP* : Cyclic adenosine monophosphate (AMP)
-- *Ca^2+* : cytosolic free $Ca^{2+}$ ions
-- *CaCaM* : $Ca^{2+}$-calmodulin
-- *aCaMK* : active state of *CaCaM*-dependent protein kinase (CaMK)
-- *V_ORN* : 
-- *V_ML* : 
-- *nK* : 
-- *CaFR* : 
-- *I_ORN* : 
+Olfactory receptor neuron (ORN) transduction model parameters (blue nodes in Fig-\@ref(fig:model))
+
+- **bLR** : Ligand-bound receptors proportion
+- **aG** : Active-state G-proteins proportion
+- **cAMP** : Cyclic adenosine monophosphate (AMP) proportion
+- **Ca** : cytosolic free $Ca^{2+}$ ions
+- **IX** : $Ca^{2+}$-dependent intermediary substance proportion
+- **CaCaM** : $Ca^{2+}$-calmodulin proportion
+- **aCaMK** : active proportion of **CaCaM**-dependent protein kinase (CaMK)
+- **V_ORN** : ORN intracellular voltage
+
+Spiking mechanism model parameters implemented in this study (red nodes in Fig-\@ref(fig:model))
+
+- **O_stim** : Odor pulse indicating the stimulus status
+- **V_ML** : Morris-Lecar (ML) voltage for spiking mechanism
+- **nK** : ML channel for $K^+$-ions activation proportion
+- **CaFR** : $Ca^{2+}$-dependent ML spike firing-rate modulation
+- **I_ORN** : ORN membrane current prediction
 
 
 ## ORN operation
@@ -78,9 +84,9 @@ G-protein activation
 
 \begin{equation} 
 \begin{split}
-O_{\text{stim}} &= \text{od} \cdot [ H(t-t_0) - H(t-t_1) ];\ \ \ \ \  \text{(single pulse)}  \\
-\frac{d\ \mathbf{bLR}}{dt} &= \text{k1} \cdot O_{\text{stim}} \cdot (\text{Rtot} - \mathbf{bLR}) - \text{r1} \cdot \mathbf{bLR} \\
-\frac{d\ \mathbf{aG}}{dt} &= \text{k2} \cdot \mathbf{bLR} \cdot (\text{Gtot} - \mathbf{aG}) - \text{r2} \cdot \mathbf{aG}
+O_{\rm stim} &= {\rm od} \cdot [ H(t-t_0) - H(t-t_1) ];\ \ \ \ \  \text{(single pulse)}  \\
+\frac{d\ \mathbf{bLR}}{dt} &= {\rm k1} \cdot O_{\rm stim} \cdot ({\rm Rtot} - \mathbf{bLR}) - {\rm r1} \cdot \mathbf{bLR} \\
+\frac{d\ \mathbf{aG}}{dt} &= {\rm k2} \cdot \mathbf{bLR} \cdot ({\rm Gtot} - \mathbf{aG}) - {\rm r2} \cdot \mathbf{aG}
 \end{split}
 \end{equation}
 
@@ -91,17 +97,12 @@ Intracellular signalling
 \begin{equation}
 \begin{split}
 \frac{d\ \mathbf{cAMP}}{dt} &= synth - pd \cdot \mathbf{cAMP} \\
-\frac{d\ \mathbf{Ca}}{dt} &= \text{inf}\cdot I_{\text{CNG}} - J_{\text{NCX}} - (\text{cc1} \cdot \mathbf{Ca} - \text{cc2} \cdot \mathbf{CaCaM}) \\
-\frac{d\ \mathbf{CaCaM}}{dt} &= \text{cc1} \cdot \mathbf{Ca} - \text{cc2} \cdot \mathbf{CaCaM} \\
-\frac{d\ \mathbf{aCaMK}}{dt} &= \text{ck1} \cdot \mathbf{CaCaM} - \text{ck2} \cdot \mathbf{aCaMK}
-\end{split}
-\end{equation}
-
-\begin{equation}
-\begin{split}
-\frac{d\ \mathbf{IX}}{dt} &= \text{cx1} \cdot \mathbf{Ca} - \text{cx2} \cdot \mathbf{IX} \\
-synth &= \frac{\mathbf{aG} \cdot \text{smax}}{1 + (\mathbf{aCaMK} / \text{kinh} )^{\text{ninh}}} \\
-&J_{\text{NCX}} = \text{ef}\cdot \mathbf{Ca}/[1+(\mathbf{IX}/\text{kI})^{\text{nI}}] \\
+\frac{d\ \mathbf{Ca}}{dt} &= {\rm inf}\cdot I_{\rm CNG} - J_{\rm NCX} - ({\rm cc1} \cdot \mathbf{Ca} - {\rm cc2} \cdot \mathbf{CaCaM}) \\
+\frac{d\ \mathbf{CaCaM}}{dt} &= {\rm cc1} \cdot \mathbf{Ca} - {\rm cc2} \cdot \mathbf{CaCaM} \\
+\frac{d\ \mathbf{aCaMK}}{dt} &= {\rm ck1} \cdot \mathbf{CaCaM} - {\rm ck2} \cdot \mathbf{aCaMK} \\
+\frac{d\ \mathbf{IX}}{dt} &= {\rm cx1} \cdot \mathbf{Ca} - {\rm cx2} \cdot \mathbf{IX} \\
+& synth = \frac{\mathbf{aG} \cdot {\rm smax}}{1 + (\mathbf{aCaMK} / {\rm kinh} )^{\rm ninh}} \\
+& J_{\rm NCX} = {\rm ef}\cdot \mathbf{Ca}/[1+(\mathbf{IX}/{\rm kI})^{\rm nI}] \\
 \end{split}
 \end{equation}
 
@@ -109,15 +110,13 @@ Effector Channel Activity / Receptor Currents
 
 \begin{equation}
 \begin{split}
-\frac{d\ \mathbf{V_{ORN}}}{dt} &= \frac{1}{\text{cap}} \cdot (\ I_{\text{CNG}} + I_{\text{Cl(Ca)}} + I_{\text{leak}}\ ) \\
-I_{\text{CNG}} &= \frac{\text{cnmax} \cdot \mathbf{cAMP}^{\text{n}_1} \cdot (\text{vcng}-\mathbf{V_{ORN}})}{\mathbf{cAMP}^{\text{n}_1} + (inhcng \cdot \text{hmc}_1)^{\text{n}_1}} \\
-inhcng &= 1 + \frac{(\text{inhmax}-1)\cdot \mathbf{CaCaM}^{\text{ninhcng}}}{\mathbf{CaCaM}^{\text{ninhcng}} + \text{kinhcng}^{\text{ninhcng}}} \\
-I_{\text{Cl(Ca)}} &= \frac{\text{clmax}\cdot \mathbf{Ca}^{\text{n}_2}\cdot (\text{vcl} - \mathbf{V_{ORN}})}{\mathbf{Ca}^{\text{n}_2} + \text{hmc}_2^{\text{n}_2}} \\
-I_{\text{leak}} &= \text{gl}\cdot (\text{vl} - \mathbf{V_{ORN}})
+\frac{d\ \mathbf{V_{ORN}}}{dt} &= \frac{1}{\rm cap} \cdot (\ I_{\rm CNG} + I_{\rm Cl(Ca)} + I_{\rm leak}\ ) + {\rm revCp} \cdot \mathbf{\dot{V}_{ML}} \\
+I_{\rm CNG} &= \frac{{\rm cnmax} \cdot \mathbf{cAMP}^{\rm n_1} \cdot ({\rm vcng}-\mathbf{V_{ORN}})}{\mathbf{cAMP}^{\rm n_1} + (inhcng \cdot {\rm hmc_1})^{\rm n_1}} \\
+& inhcng = 1 + \frac{({\rm inhmax}-1)\cdot \mathbf{CaCaM}^{\rm ninhcng}}{\mathbf{CaCaM}^{\rm ninhcng} + {\rm kinhcng}^{\rm ninhcng}} \\
+I_{\rm Cl(Ca)} &= \frac{{\rm clmax} \cdot \mathbf{Ca}^{\rm n_2} \cdot ({\rm vcl} - \mathbf{V_{ORN}})}{\mathbf{Ca}^{\rm n_2} + {\rm hmc_2^{n_2}}} \\
+I_{\rm leak} &= {\rm gl} \cdot ({\rm vl} - \mathbf{V_{ORN}})
 \end{split}
 \end{equation}
-
-
 
 
 > FIG : Conc/Adap
@@ -125,42 +124,39 @@ I_{\text{leak}} &= \text{gl}\cdot (\text{vl} - \mathbf{V_{ORN}})
 ## ML spikes {#ML}
 
 <!-- ML : V & nK -->
-\begin{align} 
-\frac{d\ \mathbf{V_{ML}}}{dt} =& \frac{ct \cdot \mathbf{CaFR}}{C_m}( I_{ions} + I_{Ca} - gL(\mathbf{V_{ML}}-v_L) \notag \\
-&- gK \cdot \mathbf{nK} \cdot (\mathbf{V_{ML}}-v_K) - gCa \cdot M_{\infty} \cdot (\mathbf{V_{ML}}-v_{Ca}) \ ) \notag \\
-\frac{d\ \mathbf{nK}}{dt} =& \frac{{ct \cdot \mathbf{CaFR}} 
-[ n_{\infty}(\mathbf{V_{ML}}) - \mathbf{nK} ]}{\tau(\mathbf{V_{ML})}}  \notag
-\end{align} 
+\begin{equation}
+\begin{split}
+\frac{d\ \mathbf{V_{ML}}}{dt} =& \frac{ct}{\rm C_m} \cdot [ I_{\rm ions} + I_{\rm Ca} - {\rm gL} \cdot (\mathbf{V_{ML}} - {\rm v_L}) - {\rm gK} \cdot \mathbf{nK} \cdot (\mathbf{V_{ML}}-{\rm v_K}) \\
+& - {\rm gCa} \cdot m_\infty(\mathbf{V_{ML}}) \cdot (\mathbf{V_{ML}}- {\rm v_{Ca}}) \ ] \\
+\frac{d\ \mathbf{nK}}{dt} =& \frac{ct \cdot [ n_\infty(\mathbf{V_{ML}}) - \mathbf{nK} ]}{\tau(\mathbf{V_{ML}})}
+\end{split}
+\end{equation}
 
 <!-- ML : V_ORN vales -->
-\begin{equation} (\#eq:par)
+\begin{equation} (\#eq:MLpar)
 \begin{split}
-&v_{\rm Ca} = 120\ mV,\  v_{\rm K} = -84\ mV,\ v_{\rm L} = -60\ mV,
-\\ &g_{\rm Ca} = 4.4\ m\mho/cm^2, \ g_{K\rm } = 8\ m\mho/cm^2,\ 
-    g_{\rm L} = 2\ m\mho/cm^2,
-\\ &C = 20\ \mu F/cm^2,\ I_{\rm app} = (variable;\ measured\ in\ 
-    \mu A/cm^2) 
-\end{split} \notag
+& ct = \frac{100\cdot {\rm maxFR}}{\mathbf{CaFR}},\ I_{\rm Ca} = {\rm \frac{gI_{Ca} \cdot \dot{Ca}}{1 + Ca}},\ I_{\rm ions}={\rm gIons (\mathbf{V_{ORN}} > spkThr )} \\
+& {\rm v_{Ca}=120\ mV,\ v_K=-84\ mV,\ v_L=-60\ mV,\ C_m=20\ \mu F/cm^2,} \\ 
+& {\rm g_{Ca}=4.4\ m\mho/cm^2,\ g_K=8\ m\mho/cm^2,\ g_L=2\ m\mho/cm^2,}
+\end{split}
 \end{equation}
 
 <!-- ML : functions -->
-\begin{align}
-\nonumber \phi=0.04\ s^{-1},\ v_a&=-1.2\ mV,\ v_b=18\ mV,\ v_c=2\ mV,\ v_d=30\ mV, \notag \\
-\xi = \frac{v-v_c}{v_d},\ 
-    &\alpha(v) = \frac{\phi \cosh(\xi/2)}{1+ e^{2\xi}},\ 
-    \beta(v) = \frac{\phi \cosh(\xi/2)}{1+ e^{-2\xi}}, \notag \\
-n_\infty(v) &= \frac{\alpha(v)}{\alpha(v) + \beta(v)} \ 
-    =\  \frac12(1 + \tanh \xi) \notag \\
-m_\infty &= \frac12\left(1+ \tanh(\frac{v-v_a}{vb})\right) \notag \\ 
-\tau(v) &= \frac{1}{\alpha(v) + \beta(v)} \ 
-    =\  \frac{1}{\phi \cosh(\xi/2)}
-\end{align}
+\begin{equation} (\#eq:MLfxn)
+\begin{split}
+\xi(v)=\frac{v-v_c}{v_d},\ &\alpha(v)=\frac{\phi \cosh(\xi/2)}{1+ e^{2\xi}},\ \beta(v)=\frac{\phi \cosh(\xi/2)}{1+ e^{-2\xi}}, \\
+n_\infty(v) &= \frac{\alpha(v)}{\alpha(v)+\beta(v)}\ =\  \frac12(1 + \tanh \xi) \\
+\tau(v) &= \frac{1}{\alpha(v) + \beta(v)}\ =\  \frac{1}{\phi \cosh(\xi/2)} \\
+m_\infty&(v) = \frac12\left(1+ \tanh(\frac{v-v_a}{vb})\right) \\ 
+\phi=0.04\ s^{-1};\ &v_a=-1.2,\ v_b=18,\ v_c=2,\ v_d=30\ {\rm mV}.
+\end{split}
+\end{equation}
 
 ### CaFR modulation
 
 <!-- CaFR -->
 \begin{equation} 
-\frac{d \mathbf{CaFR}}{dt} = (1+\mathbf{Ca})*(p(d\mathbf{Ca} > 0) - n(d\mathbf{Ca}<0\  \& \ d\mathbf{CaFR} > m)) \notag
+\frac{d\ \mathbf{CaFR}}{dt} = (1+\mathbf{Ca})*(p(d\mathbf{Ca} > 0) - n(d\mathbf{Ca}<0\  \& \ d\mathbf{CaFR} > m)) \notag
 \end{equation} 
 
 ### Ionic currents
