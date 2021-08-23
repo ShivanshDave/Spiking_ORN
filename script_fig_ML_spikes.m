@@ -8,20 +8,20 @@ DATA = simulate_ORN(PULSE,SpikeEN);
 
 %%
 plt.Lwd = 1.2;
-plt.FTsz = 16;
+plt.FTsz = 14;
 plt.Xoff = 0.02;
-plt.FGpos = [10 10 900 500];
-plt.scale = [3 12 4 4 1];
-plt.ytick = [-55,-25,0,35];
+plt.FGpos = [10 10 900 400];
+plt.scale = [4 10 8 6 1];
+plt.ytick = [-55,0,35];
 plt.xtick = [0:0.1:0.7];
-plt.fname = '.\Report\figs\fig_ML_spikes.png';
+plt.fname = '.\Report\figs\v1\fig_ML_spikes.png';
 
 plot_pulse_currents_overlap(plt,DATA)
 %%
 function plot_pulse_currents_overlap(plt,D)
 
     figure('Renderer', 'painters', 'Position', plt.FGpos);
-    plt.t = tiledlayout(sum(plt.scale),1,'TileSpacing','loose','Padding','compact');
+    plt.t = tiledlayout(sum(plt.scale),1,'TileSpacing','tight','Padding','compact');
     plt.X = [D.PULSE.tspan(1)-plt.Xoff, D.PULSE.tspan(2)];
     
     %-- Stim --
@@ -32,7 +32,7 @@ function plot_pulse_currents_overlap(plt,D)
     plt.ax1 = plot(TT,OD,'k-','LineWidth',plt.Lwd);
     ylabel('Stim')
     set(gca,'XLim',plt.X,'XColor','none','XTick', [], 'XTickLabel', [],...
-        'YTick', [0 D.PULSE.conc(1)],'YTickLabel',{'','20'},'YTickLabelRotation',90,...
+        'YTick', [0 D.PULSE.conc(1)],'YTickLabel',{'','20'},'YTickLabelRotation',0,...
         'tickdir', 'out','FontSize',plt.FTsz,...
         'color','none','box', 'off')
     
@@ -43,12 +43,12 @@ function plot_pulse_currents_overlap(plt,D)
         plt.axl(k) = plot(D.T,real(D.PRED.spkV(:,k)),'-','LineWidth',plt.Lwd);
     end
     xlabel('Time (sec)')
-    ylabel('ML Vspk(mV)')
+    ylabel('V_{ML} (mV)')
 %     lgd = legend({num2str(D.PULSE.conc)},'Location','best');
 %     title(lgd,'Conc. (uM)')    
     set(gca,'XLim',plt.X,'XColor','none','XTick',[],'XTickLabel',[],...
         'YLim',[plt.ytick(1) plt.ytick(end)],'YTick',plt.ytick,...
-        'tickdir', 'out','FontSize',plt.FTsz,'YTickLabelRotation',90,...
+        'tickdir', 'out','FontSize',plt.FTsz,'YTickLabelRotation',0,...
         'color','none','box','off','ColorOrder',[0.4940 0.1840 0.5560])
     
     % nK
@@ -62,7 +62,7 @@ function plot_pulse_currents_overlap(plt,D)
 %     lgd = legend({num2str(D.PULSE.conc)},'Location','best');
 %     title(lgd,'Conc. (uM)')    
     set(gca,'XLim',plt.X,'XColor','none','XTick',[],'XTickLabel',[],...
-        'YLim',[0,0.6],'YTick',[0,0.6],'YTickLabelRotation',90,...
+        'YLim',[0,0.6],'YTick',[0,0.6],'YTickLabelRotation',0,...
         'tickdir', 'out','FontSize',plt.FTsz,...
         'color','none','box','off','ColorOrder',hsv(8))
     
@@ -78,7 +78,7 @@ function plot_pulse_currents_overlap(plt,D)
 %     lgd = legend({num2str(D.PULSE.conc)},'Location','best');
 %     title(lgd,'Conc. (uM)')    
     set(gca,'XLim',plt.X,'XColor','none','XTick',[],'XTickLabel',[],...
-        'YLim',[1 5],'YTick',[1 5],'YTickLabelRotation',90,...
+        'YLim',[1 5],'YTick',[1 5],'YTickLabelRotation',0,...
         'tickdir', 'out','FontSize',plt.FTsz,...
         'color','none','box','off')
     
@@ -86,7 +86,7 @@ function plot_pulse_currents_overlap(plt,D)
     plot(D.T,real(D.PRED.Ca(:,k)),'--','LineWidth',plt.Lwd);
     ylabel('Ca')
     set(gca,'XLim',plt.X,'XColor','none','XTick',[],'XTickLabel',[],...
-        'YLim',[0 7],'YTick',[0 7],'YTickLabelRotation',90,...
+        'YLim',[0 7],'YTick',[0 7],'YTickLabelRotation',0,...
         'tickdir', 'out','FontSize',plt.FTsz,...
         'color','none','box','off')
 

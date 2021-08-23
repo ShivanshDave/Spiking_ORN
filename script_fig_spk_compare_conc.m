@@ -14,26 +14,26 @@ plt.FGpos = [10 10 700 900];
 plt.scale = [2 4 1];
 plt.ytick = [-65,0,20];
 plt.xtick = 0:3;
-plt.fname = '.\Report\figs\fig_spk_compare_conc.png';
+plt.fname = '.\Report\figs\v1\fig_spk_compare_conc.png';
 
 plot_pulse_currents(plt,DATA)
 
 %% << F-3 >>
 plt.Lwd = 1.2;
-plt.FTsz = 14;
+plt.FTsz = 16;
 plt.Xoff = 0.1;
-plt.FGpos = [10 10 600 900];
+plt.FGpos = [10 10 700 950];
 plt.scale = [0 5 0];
 plt.ytick = [-50,-25,0];
 plt.xtick = -1:4;
-plt.fname = '.\Report\figs\fig_spk_compare_conc_quant.png';
+plt.fname = '.\Report\figs\v1\fig_spk_compare_conc_quant.png';
 
 plot_spk_quantify(plt,DATA)
 %%
 function plot_spk_quantify(plt,DATA)
 
     figure('Renderer', 'painters', 'Position', plt.FGpos);
-    plt.t = tiledlayout(3*sum(plt.scale),1,'TileSpacing','tight','Padding','compact');
+    plt.t = tiledlayout(3*sum(plt.scale),1,'TileSpacing','tight','Padding','loose');
     
     
     %%
@@ -72,7 +72,7 @@ function plot_spk_quantify(plt,DATA)
 %     xlabel('Concentration (uM)')
     
     set(gca,'XColor','none','XTick', [], 'XTickLabel', [],...
-        'xscale','log','tickdir', 'out','FontSize',plt.FTsz,...
+        'YLim',[0 50],'xscale','log','tickdir', 'out','FontSize',plt.FTsz,...
         'color','none','box','off')
     
     %% B - Spk count
@@ -117,7 +117,7 @@ function plot_pulse_currents(plt, D)
     figure('Renderer', 'painters', 'Position', plt.FGpos);
     nc=size(D.PULSE.ton,1);
     plt.t = tiledlayout(sum([plt.scale,(nc-1)*plt.scale(2)]),1,...
-        'TileSpacing','none','Padding','compact');
+        'TileSpacing','none','Padding','loose');
     plt.X = [D.PULSE.tspan(1)-plt.Xoff, D.PULSE.tspan(2)];
     
     % STIM

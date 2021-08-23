@@ -1,14 +1,14 @@
 % Odor-pulse setup
-PULSE.ton = [ 0.2000  2 
-              0.2000 2
-              0.2000 2];
-PULSE.toff = [1.2000  3 
-              1.2000  3
-              1.2000  3];
+PULSE.ton = [ 0.000  2 
+              0.000 2
+              0.000 2];
+PULSE.toff = [1.000  3 
+              1.000  3
+              1.000  3];
 PULSE.conc = [30 5
               5  30
               0  0];
-PULSE.tspan = [0 4];
+PULSE.tspan = [-0.1 4];
 
 
 %% RUN
@@ -17,12 +17,12 @@ DATA = simulate_ORN(PULSE,SpikeEN);
 
 %% Plot
 plt.Lwd = 1;
-plt.FTsz = 14;
-plt.FGpos = [10 10 1000 600];
-plt.Xoff = 0.2;
+plt.FTsz = 18;
+plt.FGpos = [10 10 1200 450];
+plt.Xoff = 0.1;
 plt.xtick = -1:4;
-plt.scale = [1,2,4];
-plt.fname = '.\Report\figs\fig_spk_all_components.png';
+plt.scale = [1,2,6];
+plt.fname = '.\Report\figs\v1\fig_spk_all_components.png';
 
 figure('Renderer', 'painters', 'Position', plt.FGpos);
 plt.t = tiledlayout(3*plt.scale(1),sum(plt.scale(2:3)),'TileSpacing','tight','Padding','tight');
@@ -43,12 +43,17 @@ set(gca,'XLim',plt.X,'XColor','none','XTick', [], 'XTickLabel', [],...
         'color','none','box', 'off')
 
 % I ORN
-nexttile([plt.scale(1) plt.scale(3)])
-plot(DATA.T,real(DATA.PRED.Im),'LineWidth',plt.Lwd)
+nexttile([plt.scale(1) plt.scale(3)]); hold on;
+plt.ax = plot(DATA.T,real(DATA.PRED.Im),'LineWidth',plt.Lwd);
+% lgd = legend(plt.ax,'Location','northeast','NumColumns',2);
+spikes = script_spikes_ID(real(DATA.PRED.spkV),DATA.T,0);
+dind=8; set(gca,'ColorOrderIndex',1);
+i=1; scatter(DATA.T(spikes{i,1}-dind), max(-60,-7 + real(DATA.PRED.Im(spikes{i,1}-dind,i))), 15, '^','filled')
+i=2; scatter(DATA.T(spikes{i,1}-dind), max(-60,-7 + real(DATA.PRED.Im(spikes{i,1}-dind,i))), 15, '^','filled')
 % xlabel('Time (sec)')
-ylabel('I_{ORN} (pA)')
+ylabel('I_{ORN}(pA)')
 set(gca,'XLim',plt.X,'XColor','none','XTick', [], 'XTickLabel', [],...
-        'YLim',[-55 20],'YTick', [-55 0 20], 'YTickLabelRotation',0,...
+        'YLim',[-60 20],'YTick', [-60 0 20], 'YTickLabelRotation',0,...
         'tickdir', 'out','FontSize',plt.FTsz,...
         'color','none','box', 'off')
 
@@ -67,7 +72,7 @@ set(gca,'XLim',plt.X,'XColor','none','XTick', [], 'XTickLabel', [],...
 nexttile([plt.scale(1) plt.scale(3)])
 plot(DATA.T,real(DATA.PRED.spkV),'LineWidth',plt.Lwd)
 % xlabel('Time (sec)')
-ylabel('V_{SPK} (mV)')
+ylabel('V_{ML}(mV)')
 set(gca,'XLim',plt.X,'XColor','none','XTick', [], 'XTickLabel', [],...
         'YLim',[-60 40],'YTick', [-60 0 40], 'YTickLabelRotation',0,...
         'tickdir', 'out','FontSize',plt.FTsz,...

@@ -1,7 +1,7 @@
 digraph spiking_ORN {
 	rankdir=LR;
 	node [shape = doublecircle, color=red, width=0.7,fontsize=15]; O_stim, I_ORN;
-	node [shape = doublecircle, color=blue, width=1,fontsize=18]; Ca;
+	//node [shape = doublecircle, color=blue, width=1,fontsize=18]; Ca;
 	node [shape = circle, color=blue, width=0, fontsize=15]; IX;
 	node [shape = circle, color=blue, width=1,fontsize=18,style=unfilled];
 	edge [color=black];

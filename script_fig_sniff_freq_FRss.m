@@ -6,6 +6,10 @@ D.conc = [10,20,50,300]';
 D.np = 5; 
 plt.raw_plots = 1;
 plt.FR_plots = 1;
+plt.pulseOnly = 1; % 1 for Pulse-Figure (methods section)
+plt.plotsOnly = 1; % 1 for re-generate figures
+
+if plt.pulseOnly; D.test_frq = 30; end 
 
 %% COLLECT DATA
 for i=1:length(D.test_frq)
@@ -17,12 +21,17 @@ for i=1:length(D.test_frq)
     PULSE.toff = round(T/3,1) + T*(0:D.np-1).*ones(plt.N,1);
     PULSE.conc = D.conc.*ones(1,D.np).*ones(plt.N,1);
     PULSE.tspan = [-1 D.np*T+1];
+    if plt.pulseOnly; continue; end
 
     % %
     disp(['F=',num2str(b_frq)]);
-    DATA = simulate_ORN(PULSE);
-    DATA.spk = script_spikes_ID(real(DATA.PRED.spkV),DATA.T,0);
-    D.(['f',num2str(b_frq)]) = DATA;
+    if ~plt.plotsOnly
+        DATA = simulate_ORN(PULSE);
+        DATA.spk = script_spikes_ID(real(DATA.PRED.spkV),DATA.T,0);
+        D.(['f',num2str(b_frq)]) = DATA;
+    else
+        DATA = D.(['f',num2str(b_frq)]);
+    end
     % %
     if plt.raw_plots
         % % Plot
@@ -58,24 +67,60 @@ end
 %%
 if plt.FR_plots
     % % Plot
-    plt.Lwd = 1;
-    plt.FTsz = 16;
-    plt.FGpos = [10 10 900 600];
+    plt.Lwd = 2;
+    plt.FTsz = 24;
+    plt.FGpos = [10 10 900 700];
     plt.Xoff = 1;
     plt.xtick = -1:4;
     plt.scale = [7,1];
-    plt.fname = ['.\Report\figs\fig_sniff_freq_FR_tuning'];
+    plt.fname = ['.\Report\figs\v1\fig_sniff_freq_FR_tuning'];
 
     plot_freq_FRss(plt,D);
 end
 %%
-disp('---DONE---')
+if plt.pulseOnly
+    % % Plot
+    plt.Lwd = 1;
+    plt.FTsz = 18;
+    plt.FGpos = [10 10 1200 300];
+    plt.Xoff = 0.25;
+    plt.xtick = -1:12;
+    plt.scale = [1,1];
+    plt.fname = ['.\Report\figs\v1\fig_sniff_pulse'];
 
+    plot_freq_pulse(plt,PULSE);
+end
+
+disp('---DONE---')
+%%
+function plot_freq_pulse(plt,PULSE)
+    figure('Renderer', 'painters', 'Position', plt.FGpos);
+    plt.t = tiledlayout(plt.scale(1),plt.scale(2),'TileSpacing','tight','Padding','tight');
+    plt.X = [PULSE.tspan(1)-plt.Xoff, PULSE.tspan(2)];
+    plt.ax = [];
+
+    % PULSE
+    plt.ax(end+1) = nexttile([plt.scale(1) plt.scale(2)]);
+    TT = linspace(PULSE.tspan(1),PULSE.tspan(2),100);
+    OD = simulate_pulse_train(TT,PULSE.ton,PULSE.toff,PULSE.conc);
+    % OD = OD(end,:);
+    plot(TT,OD,'LineWidth',plt.Lwd);
+    lgd=legend(num2str(PULSE.conc(:,1)),'Box','off');
+    title(lgd,'Conc. (uM)') 
+    xlabel('Time (sec)')
+    ylabel({'O_{stim} (uM)'})
+    set(gca,'XLim',plt.X,'XTick', plt.xtick,...
+            'YLim',[-30 300],'YTickLabelRotation',0,...
+            'tickdir', 'out','FontSize',plt.FTsz,...
+            'color','none','box', 'off')
+        
+    exportgraphics(gcf,[plt.fname '.png'],'Resolution',300)
+end
 
 function plot_freq_FRss(plt,D)
     %% INFORMATION GAIN
     figure('Renderer', 'painters', 'Position', plt.FGpos);
-    plt.t = tiledlayout(2*plt.scale(1),1,'TileSpacing','tight','Padding','tight');
+    plt.t = tiledlayout(2*plt.scale(1),1,'TileSpacing','tight','Padding','loose');
     plt.X = [D.test_frq(1)-plt.Xoff, D.test_frq(end)];
     plt.ax = [];
 
@@ -86,7 +131,8 @@ function plot_freq_FRss(plt,D)
     set(gca,'ColorOrderIndex',1)
     scatter(D.test_frq, D.FRmx,75,'^')
     % xlabel('Time (sec)')
-    ylabel('Peak Spike-rate')
+    ylabel({'(peak)'})
+    title('First stimulus-pulse')
     set(gca,'XLim',plt.X,'XColor','none','XTick', [], 'XTickLabel', [],...
             'YTickLabelRotation',0,...
             'tickdir', 'out','FontSize',plt.FTsz,...
@@ -99,13 +145,16 @@ function plot_freq_FRss(plt,D)
     set(gca,'ColorOrderIndex',1)
     scatter(D.test_frq, D.FRss,75,'^')
     xlabel('Breathing frequency (bpm)')
-    ylabel('Steady-state Spike-rate')
-    lgd = legend({num2str(D.conc)},'Location','best');
+    ylabel({'(steady-state)'})
+    title('Last stimulus-pulse')
+    lgd = legend({num2str(D.conc)},'Location','best','Box','off');
     title(lgd,'Conc. (uM)') 
-    set(gca,'XLim',plt.X,...
+    set(gca,'XLim',plt.X,'YLim',[-1 10],...
             'YTickLabelRotation',0,...
             'tickdir', 'out','FontSize',plt.FTsz,...
             'color','none','box', 'off')
+        
+    ylabel(plt.t, 'Sniffing sensitivity','FontSize',plt.FTsz+2)
         
 
     linkaxes(plt.ax(:),'x')    
@@ -114,7 +163,7 @@ function plot_freq_FRss(plt,D)
     
     %% COUNT
     figure('Renderer', 'painters', 'Position', plt.FGpos);
-    plt.t = tiledlayout(2*plt.scale(1),1,'TileSpacing','tight','Padding','tight');
+    plt.t = tiledlayout(2*plt.scale(1),1,'TileSpacing','tight','Padding','loose');
     plt.X = [D.test_frq(1)-plt.Xoff, D.test_frq(end)];
     plt.ax = [];
 
@@ -125,7 +174,8 @@ function plot_freq_FRss(plt,D)
     set(gca,'ColorOrderIndex',1)
     scatter(D.test_frq, D.num_spk_mx,75,'^')
     % xlabel('Time (sec)')
-    ylabel('Peak Spike-count')
+    ylabel({'(peak)'})
+    title('First stimulus-pulse')
     set(gca,'XLim',plt.X,'XColor','none','XTick', [], 'XTickLabel', [],...
             'YTickLabelRotation',0,...
             'tickdir', 'out','FontSize',plt.FTsz,...
@@ -138,15 +188,17 @@ function plot_freq_FRss(plt,D)
     set(gca,'ColorOrderIndex',1)
     scatter(D.test_frq, D.num_spk_ss,75,'^')
     xlabel('Breathing frequency (bpm)')
-    ylabel('Steady-state Spike-count')
-    lgd = legend({num2str(D.conc)},'Location','best');
-    title(lgd,'Conc. (uM)') 
-    set(gca,'XLim',plt.X,...
+    ylabel({'(steady-state)'})
+    title('Last stimulus-pulse')
+%     lgd = legend({num2str(D.conc)},'Location','east','Box','off');
+%     title(lgd,'Conc. (uM)') 
+    set(gca,'XLim',plt.X,'YLim',[-1 10],...
             'YTickLabelRotation',0,...
             'tickdir', 'out','FontSize',plt.FTsz,...
             'color','none','box', 'off')
         
-
+    ylabel(plt.t, 'ORN Spike count','FontSize',plt.FTsz+2)
+       
     linkaxes(plt.ax(:),'x')    
     exportgraphics(gcf,[plt.fname '_raw.png'],'Resolution',300)
     
@@ -205,7 +257,7 @@ function plot_one_bfreq(plt,DATA)
     plt.ax(end+1) = nexttile([plt.scale(1) plt.scale(3)]);
     plot(DATA.T,real(DATA.PRED.spkV),'LineWidth',plt.Lwd)
     % xlabel('Time (sec)')
-    ylabel('V_{SPK} (mV)')
+    ylabel('V_{ML} (mV)')
     set(gca,'XLim',plt.X,'XColor','none','XTick', [], 'XTickLabel', [],...
             'YLim',[-60 40],'YTick', [-60 0 40], 'YTickLabelRotation',0,...
             'tickdir', 'out','FontSize',plt.FTsz,...

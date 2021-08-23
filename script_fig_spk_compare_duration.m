@@ -7,15 +7,15 @@ PULSE.tspan = [-.01 12];
 DATA = simulate_ORN(PULSE,SpikeEN);
 
 %%
-plt.Lwd = 1.2;
-plt.FTsz = 16;
+plt.Lwd = 2;
+plt.FTsz = 24;
 plt.Xoff = 0.05;
-plt.FGpos = [10 10 500 500];
+plt.FGpos = [10 10 900 700];
 plt.scale = [3 4 1 1];
 plt.ytick = [-55,0,20];
 plt.xtick = 0:0.25:1;
 plt.tspan = [0 .75];
-plt.fname = '.\Report\figs\fig_spk_compare_dur.png';
+plt.fname = '.\Report\figs\v1\fig_spk_compare_dur.png';
 
 plot_pulse_currents(plt,DATA)
 
@@ -46,13 +46,14 @@ function plot_pulse_currents(plt, D)
 %         'tickdir', 'out','FontSize',plt.FTsz,...
 %         'color','none','box', 'off')
     
-    clr = summer(nc);
+    all_clr = 0.9*cool(8);
+    clr_i = [1,5,6,7,8];
     for k = 1:nc
         nexttile([plt.scale(2) 1])       
         plt.axl(k) = plot(D.T,real(D.PRED.Im(:,k)),'-',...
-            'LineWidth',plt.Lwd,'Color',clr(2,:));
+            'LineWidth',plt.Lwd,'Color',all_clr(clr_i(k),:));
         text(plt.tspan(1),15,[num2str(D.PULSE.toff(k)),' s'],...
-            'HorizontalAlignment','left','FontSize',plt.FTsz-2,'Color','black')
+            'HorizontalAlignment','left','FontSize',plt.FTsz-2,'Color',all_clr(clr_i(k),:))
         set(gca,'XLim',plt.X,'XColor','none','XTick',[],'XTickLabel',[],...
             'YLim',[plt.ytick(1) plt.ytick(end)],...
             'YColor','none','YTick',[],'YTickLabel',[],...
