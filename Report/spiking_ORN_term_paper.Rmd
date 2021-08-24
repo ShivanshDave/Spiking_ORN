@@ -32,15 +32,11 @@ knitr::opts_chunk$set(echo=FALSE,fig.align='center') #warning=FALSE, message=FAL
 \floatplacement{figure}{!htb}
 
 <!-- Text  -->
-# Summary {-}
-
-[@reisert99adaptation] 
-
-
-
 # Introduction
 
-
+Is the problem motivated convincingly?
+Is it described clearly? Is a central hypothesis stated clearly?
+Are the relevant equations derived appropriately?
 
 
 
@@ -187,6 +183,13 @@ knitr::include_graphics(c('figs/v1/fig_ML_spikes_with_ORN.png'))
 
 Figure-\@ref(fig:MLspkORN) compares transduction voltages of a non-spiking ORN (orange) with a spiking ORN (blue). The first panel is ML-voltage ($V_{\rm ML}$) which is added back to ORN transduction simulation (into $V_{\rm ORN}$) and eventually the predicted current ($I_{\rm ORN}$) will have the effects of ML spikes. Local-minima identification algorithm is used to identify spikes in ORN for the further study.
 
+<!-- ### Spike identification {-} -->
+
+```{r MLspkID, out.width = "80%", fig.cap="Identifying ML-spikes to indicate an event responses of various stimulus concentrations"}
+knitr::include_graphics(c('figs/v1/fig_ML_spikes_ID.png')) 
+```
+
+
 ## Sniffing experiment
 
 ```{r pulse, out.width = "90%", fig.cap="Example stimulus of 30 breaths/min used in sniffing experiment"}
@@ -236,33 +239,51 @@ A hypothesis I am testing testing here is this :
 
 > Higher breathing frequency will have higher adaptation response and hence, lower steady-state response in terms of spike-count.
 
-```{r , out.width = "50%", fig.cap="Count", fig.subcap=c('Spike-count','sniffing sensitivity')}
+```{r rSen, out.width = "50%", fig.cap="Count", fig.subcap=c('Spike-count','sniffing sensitivity')}
 knitr::include_graphics(c('figs/v1/fig_sniff_freq_FR_tuning_raw.png','figs/v1/fig_sniff_freq_FR_tuning_gain.png')) 
 ```
 
-Figure-\@ref(fig:rAdp)(a) shows number of spikes during the first-sniff (peak-count) vs last-sniff (steady-state), and steady-state spike counts steadiely decrease with increasing breathing frequency. 
+Figure-\@ref(fig:rSen)(a) shows number of spikes during the first-sniff (peak-count) vs last-sniff (steady-state), and steady-state spike counts steadiely decrease with increasing breathing frequency. 
 
-### ORN sensitivity vs sniffing frequency
+### ORN sensitivity vs brerathing frequency
 
-Spike-count / stimulus-duration
+Figure-\@ref(fig:rSen)(b) shows peak and steady-state sniffing sensitivity for a given breathing frequency, and the range between 20 to 30 breaths/min shows optimal sniffing sensitivity for higher concentration stimulus. See $\S$\@ref(CD)(F) for discussion over defining ORN sensitivity.
 
-Adaptation vs sniffing frequency
-
-```{r , out.width = "80%", fig.cap="Adap"}
-knitr::include_graphics(c('figs/fig_sniff_freq_FR_tuning_gain.png')) 
-```
+Raw signals in Appendix C.
 
 # Discussion and Conclusions {#CD}
 
-1. **res-1.**
+A.  **Transduction current simulation matches experimental data in shape but not in peak-response**
+
+Peak cellular current in ORN transduction simulation (Fig-\@ref(fig:txCon),\@ref(fig:txAdp)) is lower in amplitude as compared to the experimental data (Fig-\@ref(fig:r99f24)). However, both matches in overall shape and trends. This difference is inherited from the ORN model I used from previous study [@dougherty05computational], which provides various sets of fitted parameters for ORN model and I used the one suitable for Ca-based adaptation simulation. Since my goal of this study was to introduce action potentials in ORN, I did not try to match them. To match the peak current, one can use the parameters optimized for ORN concentration response [@dougherty05modeldb].
+
+B.  **Morris-Lecar (ML) model can be integrated in mechanistic ORN model and it is different than just adding ML spikes post-simulation**
+
+\S\@ref(ML) shows the method I used to introduce ML spikes in ORN simulations, which uses three additional ODEs integrated along with others from sensory-transduction in mutually dependent fashion. Meaning, change in ML voltage will alter species concentrations of transduction mechanisms and vice versa. Just to demonstrate how ML spikes in an ORN would look if they were added later after the transduction simulation, see Figure-\@ref(fig:MLover). 
+
+C.  **Spike identification works robustly for both low and high concentrations**
+
+Figure-\@ref(fig:MLspkID) shows spike identified in a lower and higher  concentration stimulus. I did not use a threshold based method to identify them but used an algorithm to find local minima in ML spikes. Primary purpose to identify spikes in ORN is to use them in stimulus-response profiling shown in Figure-\@ref(fig:rCon) and \@ref(fig:rSen). Another example for robustness of spike-identification can be seen in plots in Appendix C, and especially in steady-state response (Fig-\@ref(fig:f10bpmSS)).
+
+D.  **`CaFR` can modulate firing frequency dynamically to match experimental data**
+
+Without `CaFR` (i.e. ${\rm CaFR}=1$ and $\dot{\rm CaFR}=0$) we will get a fixed firing frequency of ORN spikes (see Fig-\@ref(fig:aCaFR1)). However, `CaFR` causes high rate at the beginning of the response and reducing over time to match the firing trend found in experimental data (Appendix A). Though, `CaFR` is a mathematical phenomenon, it matches the operation of certain recently found calcium-activated chloride channels which depolarize the cell and clamp the ORN firing activity [@zak18calciumactivated].
+
+E.  **ML spikes in ORN model matches to high concentration responses in experimental data but not to the lower concentrations due to mismatching spike-counts**
+
+ORN spikes in Figure-\@ref(fig:rCon) and \@ref(fig:rAdp) matches the experimental data Figure-\@ref(fig:r99f13)-\@ref(fig:r99f5) in terms of latency and spike frequency. For my model, spike frequency is modeled after slope of calcium-intake, which reduces spike-counts for lower slope and inhibits in negative slope because my aim for this study was to match initial spike response of ORN. This prevents sustained spikes seen in Figure-\@ref(fig:r99f5) during low-concentration prolong stimulus response, which is missing in my spiking ORN simulation. This also explains very high spike-counts for lower concentrations in Figure-\@ref(fig:r99f13)(b). Such response can be matched likely by adding a separate dynamics activated based on something like `aG` and inhibited by `Ca`.
+
+F.  **Sniffing sensitivity can identify suitable breathing frequency for frog ORN**
   
-  Figure shows 
-  
+`sniffing sensitivity` is defined as the spike count for a given odor-stimulus duration. So, for a same duration stimulus, higher number of spike responses in the ORN will yield higher sensitivity. Also, for same number of spike responses yield in shorter odor-stimulus will mean higher sensitivity. Increasing sensitivity with increased sniffing-frequency is a potential mechanism to optimize olfactory search duration especially in turbulent environments [@baker18algorithmsa]. Higher sniffing frequency can help detect odor signals in fast-changing environments.
+
+#### Conclusion {-}
+
+In summary, ML model can be used to represent action potential responses in frog ORNs with certain limitations, and the combined model can be used for adaptation and sniffing related experiments. I found higher adaptation response for a higher breathing frequency in ORN, which is matching to my hypothesis and is consistent with the biological expectations. Such simulations can be used to understand olfactory search and other odor-guided animal behaviors.
 
 \clearpage 
 
 # (APPENDIX) Appendix {-}
-
 
 # Appendix A : Experimental data (for comparing with simulation) {-}
 
@@ -272,13 +293,15 @@ knitr::include_graphics(c('figs/fig_sniff_freq_FR_tuning_gain.png'))
 knitr::include_graphics(c('figs/Reisert1999/fig_txn_compare_conc_quant_R99_F2.png','figs/Reisert1999/fig_txn_compare_adaptation_R99_F4.png')) 
 ```
 
+\clearpage
+
 ## Spikes in ORN {-}
 
 ```{r r99f13, out.width = "50%", fig.subcap=c('Reisert 1999 - Fig-1','Reisert 1999 - 3') , fig.cap="Spike-response profiling figures (Reisert 1999); (a) Responses of an olfactory receptor cell to odour stimuli of increasing concentration recorded with the suction pipette technique; (b) Collected dose-response data from six cells"}
 knitr::include_graphics(c('figs/Reisert1999/fig_spk_compare_conc_R99_F1.png','figs/Reisert1999/fig_spk_compare_conc_quant_R99_F3.png')) 
 ```
 
-```{r r99f5, out.width = "60%", fig.cap="The effect of adaptation on the odour-induced spike firing response (Fig-5; Reisert 1999)"}
+```{r r99f5, out.width = "80%", fig.cap="The effect of adaptation on the odour-induced spike firing response (Fig-5; Reisert 1999)"}
 knitr::include_graphics('figs/Reisert1999/fig_spk_compare_adaptation_R99_F5.png') 
 ```
 
@@ -286,22 +309,16 @@ knitr::include_graphics('figs/Reisert1999/fig_spk_compare_adaptation_R99_F5.png'
 
 # Appendix B : Supplimentary plots {-}
 
-### Spike identification {-}
+### Differences in adding  Morris-Lecar dynamics {-}
 
-```{r MLspkID, out.width = "70%", fig.cap="Identifying ML-spikes to indicate an event responses of various stimulus concentrations"}
-knitr::include_graphics(c('figs/v1/fig_ML_spikes_ID.png')) 
+```{r MLover, out.width = "70%", fig.cap="Simulations with ML integrated into molecular process (top) and added ML-spikes separately post-simulation (bottom)"}
+knitr::include_graphics(c('figs/Appendix/supp_fig_ML_spikes_OVERLAP.png')) 
 ```
 
 ### Effect of CaFR {-}
 
 ```{r aCaFR1, out.width = "70%", fig.cap="Simulations with keeping CaFR=1 for the entire duration"}
 knitr::include_graphics(c('figs/Appendix/supp_fig_ML_ID_w_CaFR_1.png')) 
-```
-
-### Differences in adding  Morris-Lecar dynamics {-}
-
-```{r MLover, out.width = "70%", fig.cap="Simulations with ML integrated into molecular process (top) and added ML-spikes separately post-simulation (bottom)"}
-knitr::include_graphics(c('figs/Appendix/supp_fig_ML_spikes_OVERLAP.png')) 
 ```
 
 \clearpage
