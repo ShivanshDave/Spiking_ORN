@@ -1,0 +1,58 @@
+digraph spiking_ORN {
+	rankdir=LR;
+	node [shape = doublecircle, color=red, width=0.7,fontsize=15]; O_stim, I_ORN;
+	//node [shape = doublecircle, color=blue, width=1,fontsize=18]; Ca;
+	node [shape = circle, color=blue, width=0, fontsize=15]; IX;
+	node [shape = circle, color=blue, width=1,fontsize=18,style=unfilled];
+	edge [color=black];
+	
+
+	subgraph clusterB {
+		node [style=filled, color=pink];
+		edge [color=red];
+		label = "Morris-Lecar spikes";
+		fontsize = 20;
+		fontcolor=red;
+		color=blue;
+		nK -> V_ML[label = gK, arrowhead=odot];
+		CaFR -> V_ML [arrowhead="odot",label = "ct",headport="ne"];
+		CaFR -> nK [label = "ct", arrowhead=odot];
+		V_ML -> nK [label = "tau"];
+		V_ML -> V_ML [label = "gCa - gL"];
+		{rank = max nK}
+		{rank = same CaFR V_ML}
+    }
+
+	O_stim -> bLR [label = k1, headport=nw];
+	bLR -> bLR [label = r1, arrowhead=odot];
+	bLR -> aG [label = k2];
+	aG -> aG [label = r2, arrowhead=odot];
+	aG -> cAMP [label = synth];
+	aCaMK -> cAMP [label = synth, arrowhead=odot,headport=nw];
+	cAMP -> cAMP [label = pd, arrowhead=odot];
+	CaCaM -> aCaMK [label = ck1];
+	aCaMK -> aCaMK [label = ck2, arrowhead=odot];
+	CaCaM -> CaCaM [label = cc2, arrowhead=odot];
+	Ca -> CaCaM [label = cc1, headport=se];	
+	Ca -> Ca [label = cc1, arrowhead=odot];	
+	CaCaM -> Ca [label = cc2, headport=nw];
+
+	Ca -> IX [label = cx1];
+	IX -> IX [label = cx2, arrowhead=odot];
+	IX -> Ca [label = Jncx, arrowhead=odot,headport=ne];
+
+	cAMP -> Ca [label = Icng];
+	cAMP -> V_ORN [label = Icng, headport=nw];
+	V_ORN -> V_ORN [label = gl, arrowhead=odot];
+	Ca -> V_ORN [label="Icl(ca)", headport=ne];
+	V_ORN -> I_ORN [label = gl];
+	Ca -> CaFR [label = "dCa"];
+	V_ORN -> V_ML [dir=both, label=gIons, taillabel="  revCp"];
+	Ca -> V_ML [label = "Ica"];
+
+	{rank = min bLR O_stim I_ORN}
+	{rank = same cAMP aCaMK V_ORN}
+	{rank = same Ca CaCaM}
+}
+
+// dot -Tpng -Gdpi=300 spiking_ORN_model.gv -o .\figs\model.png

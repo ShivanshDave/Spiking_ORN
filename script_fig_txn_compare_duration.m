@@ -7,14 +7,14 @@ PULSE.tspan = [-1 12];
 DATA = simulate_ORN(PULSE,SpikeEN);
 
 %%
-plt.Lwd = 1.2;
-plt.FTsz = 16;
+plt.Lwd = 2;
+plt.FTsz = 24;
 plt.Xoff = 0.25;
-plt.FGpos = [10 10 900 500];
+plt.FGpos = [10 10 900 700];
 plt.scale = [3 12 1];
 plt.ytick = [-50,-25,0];
-plt.xtick = [-1,0,1,2,5,10];
-plt.fname = '.\Report\figs\fig_txn_compare_dur.png';
+plt.xtick = [-1,0,1,2,5,10,12];
+plt.fname = '.\Report\figs\v1\fig_txn_compare_dur.png';
 
 plot_pulse_currents_overlap(plt,DATA)
 %%
@@ -33,7 +33,7 @@ function plot_pulse_currents_overlap(plt,D)
     set(gca,'XLim',plt.X,'XColor','none','XTick', [], 'XTickLabel', [],...
         'YTick', [0 D.PULSE.conc(1)],...
         'tickdir', 'out','FontSize',plt.FTsz,...
-        'color','none','box', 'off','ColorOrder',turbo(8))
+        'color','none','box', 'off','ColorOrder',0.9*cool(8))
 
     nexttile([plt.scale(2) 1])
     hold on
@@ -43,12 +43,12 @@ function plot_pulse_currents_overlap(plt,D)
     xlabel('Time (sec)')
     ylabel({'Cell Current','(pA)'})
     lgd = legend({num2str(D.PULSE.toff)},'NumColumns',2,...
-        'Location','best');
+        'Location','best','Box','off');
     title(lgd,'Duration. (Sec)')    
     set(gca,'XLim',plt.X,'XColor','none','XTick',[],'XTickLabel',[],...
         'YLim',[plt.ytick(1) plt.ytick(end)],'YTick',plt.ytick,...
         'tickdir', 'out','FontSize',plt.FTsz,...
-        'color','none','box','off','ColorOrder',turbo(8))
+        'color','none','box','off','ColorOrder',0.9*cool(8))
 
     nexttile([plt.scale(3) 1])
     axis();

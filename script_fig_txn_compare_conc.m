@@ -7,25 +7,25 @@ PULSE.tspan = [-1 4];
 DATA = simulate_ORN(PULSE,SpikeEN);
 
 %% << F2A >>
-plt.Lwd = 1.2;
-plt.FTsz = 16;
+plt.Lwd = 2;
+plt.FTsz = 24;
 plt.Xoff = 0.1;
-plt.FGpos = [10 10 900 500];
-plt.scale = [3 12 1];
+plt.FGpos = [10 10 900 700];
+plt.scale = [2 14 1];
 plt.ytick = [-50,-25,0];
 plt.xtick = -1:4;
-plt.fname = '.\Report\figs\fig_txn_compare_conc.png';
+plt.fname = '.\Report\figs\v1\fig_txn_compare_conc.png';
 
 plot_pulse_currents_overlap(plt,DATA)
 %% << F2B >>
-plt.Lwd = 1.2;
-plt.FTsz = 16;
+% plt.Lwd = 1.5;
+% plt.FTsz = 18;
 plt.Xoff = 0.1;
-plt.FGpos = [10 10 700 500];
+plt.FGpos = [10 10 900 700];
 plt.scale = [0 15 0];
 plt.ytick = [-50,-25,0];
 plt.xtick = -1:4;
-plt.fname = '.\Report\figs\fig_txn_compare_conc_quant.png';
+plt.fname = '.\Report\figs\v1\fig_txn_compare_conc_quant.png';
 
 plot_pulse_quantify(plt,DATA)
 %%
@@ -40,11 +40,11 @@ function plot_pulse_quantify(plt,DATA)
     nexttile([plt.scale(2) 1])
     hold on
     plot(DATA.PULSE.conc, real(max(DATA.PRED.Im)),'k--')
-    scatter(DATA.PULSE.conc, real(max(DATA.PRED.Im)),sz,0.75*turbo(8),'s','LineWidth',1.5)
+    scatter(DATA.PULSE.conc, real(max(DATA.PRED.Im)),sz,0.75*turbo(8),'s','LineWidth',plt.Lwd)
     plot(DATA.PULSE.conc, real(DATA.PRED.Im(ix,:)),'k-')
     scatter(DATA.PULSE.conc, real(DATA.PRED.Im(ix,:)),sz,0.75*turbo(8),'filled','s')
-    text(100,-42,'Peak Current','FontSize',plt.FTsz-2)
-    text(100,-17,'Plateau Current','FontSize',plt.FTsz-2)
+    text(100,-42,'Peak Current','FontSize',plt.FTsz)
+    text(100,-17,'Plateau Current','FontSize',plt.FTsz)
     xlabel('Concentration (uM)')
     ylabel({'Cell Current (pA)'})
     set(gca,'xscale','log','YDir','reverse','tickdir', 'out','FontSize',plt.FTsz,...
@@ -77,7 +77,7 @@ function plot_pulse_currents_overlap(plt,D)
     end
     xlabel('Time (sec)')
     ylabel({'Cell Current','(pA)'})
-    lgd = legend({num2str(D.PULSE.conc)},'Location','best');
+    lgd = legend({num2str(D.PULSE.conc)},'Location','best','Box','off');
     title(lgd,'Conc. (uM)')    
     set(gca,'XLim',plt.X,'XColor','none','XTick',[],'XTickLabel',[],...
         'YLim',[plt.ytick(1) plt.ytick(end)],'YTick',plt.ytick,...

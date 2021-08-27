@@ -9,14 +9,14 @@ DATA = simulate_ORN(PULSE,SpikeEN);
 
 %%
 plt.Lwd = 1.2;
-plt.FTsz = 16;
+plt.FTsz = 18;
 plt.Xoff = 0.1;
-plt.FGpos = [10 10 900 600];
-plt.scale = [3 4 1];
+plt.FGpos = [10 10 1200 500];
+plt.scale = [3 5 1];
 plt.ytick = [-50,0,20];
-plt.xtick = [0 2 4 6];
+plt.xtick = [0 2 4 5 6];
 plt.tspan = PULSE.tspan;
-plt.fname = '.\Report\figs\fig_spk_compare_adaptation.png';
+plt.fname = '.\Report\figs\v1\fig_spk_compare_adaptation.png';
 
 plot_pulse_currents(plt,DATA)
 
@@ -26,7 +26,7 @@ function plot_pulse_currents(plt, D)
     figure('Renderer', 'painters', 'Position', plt.FGpos);
     nc=size(D.PULSE.ton,1);
     plt.t = tiledlayout(sum([plt.scale,(nc-1)*plt.scale(2)]),1,...
-        'TileSpacing','none','Padding','compact');
+        'TileSpacing','none','Padding','tight');
     plt.X = [plt.tspan(1)-plt.Xoff, plt.tspan(2)];
     
     nexttile([plt.scale(1) 1])

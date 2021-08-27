@@ -9,13 +9,13 @@ DATA = simulate_ORN(PULSE,SpikeEN);
 
 %%
 plt.Lwd = 1.2;
-plt.FTsz = 16;
+plt.FTsz = 18;
 plt.Xoff = 0.1;
 plt.FGpos = [10 10 900 500];
-plt.scale = [3 12 1];
-plt.ytick = [-50,-25,0];
+plt.scale = [3 13 1];
+plt.ytick = [-40,-20,0];
 plt.xtick = [-4,0,1,4];
-plt.fname = '.\Report\figs\fig_txn_compare_adaptation.png';
+plt.fname = '.\Report\figs\v1\fig_txn_compare_adaptation.png';
 
 plot_pulse_currents_overlap(plt,DATA)
 %%
@@ -44,7 +44,7 @@ function plot_pulse_currents_overlap(plt,D)
     end
     xlabel('Time (sec)')
     ylabel({'Cell Current','(pA)'})
-    lgd = legend({num2str(D.PULSE.conc(:,2))},'Location','best');
+    lgd = legend({num2str(D.PULSE.conc(:,2))},'Location','best','Box','off');
     title(lgd,'Conc. (uM)')    
     set(gca,'XLim',plt.X,'XColor','none','XTick',[],'XTickLabel',[],...
         'YLim',[plt.ytick(1) plt.ytick(end)],'YTick',plt.ytick,...
