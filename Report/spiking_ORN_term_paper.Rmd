@@ -1,13 +1,13 @@
 ---
-title: "Spiking ORN"
+title: "Modeling of spiking olfactory receptors using a molecular transduction model"
 author: |
   | Shivansh Dave 
   | Biology Department, Case Western Reserve University
   | shivansh@case.edu
 date: |
-  | August 1, 2021
+  | August 30, 2021
   | 
-  | *To be submitted as a term paper for BIOL 478 (Spring, 2021)*
+  | *To be submitted as a term paper for BIOL 478 (Spring, 2021),*
   | *Computational Neuroscience by Dr. Peter J. Thomas*
 
 output: 
@@ -32,15 +32,19 @@ knitr::opts_chunk$set(echo=FALSE,fig.align='center') #warning=FALSE, message=FAL
 \floatplacement{figure}{!htb}
 
 <!-- Text  -->
+
 # Introduction
 
-Is the problem motivated convincingly?
-Is it described clearly? Is a central hypothesis stated clearly?
-Are the relevant equations derived appropriately?
+The special sense of smell originates as chemoreception at olfactory receptor neurons (ORN) in olfactory epithelium in the vertebrate nose. Humans have around 10-20 million ORNs located in the nasal cavity, all exposed to outside environment unlike any other neurons. This makes ORNs vulnerable of external damages and results into ORNs having very high turnover rate, continuously regenerating from stem cells, to maintain olfactory function. This makes ORNs one of the very few types of neurons capable of regenerating throughout the lifespan. 
 
+Each ORN expresses just one type of olfactory receptors (OR), and all the ORNs expressing a same receptor project their axon terminals to a same region in olfactory bulb, forming a glomerulus. Multiple odorants can bind to a same type of olfactory receptor, and also one odorant type can bind to multiple olfactory receptor types, which allows a large number of unique possibilities. As a result of such complex computations, humans are capable of discriminating more than 1 Trillion smells [@bushdid14humans]. 
 
+Olfactory receptors are the G protein-coupled receptors (GPCR), metabotropic type of membrane receptors, which change their structure upon odorant binding and trigger a molecular signaling cascade which finally lead to firing an action potential. There are many modeling studies to mechanistically explain the molecular process involved in signal transduction (i.e. from odorant to membrane potential). Most often these studies do not model signal encoding part (i.e. odor-signal to spike-response of an ORN). However, there are many independent models present to just explain the neural-spike response of these ORNs often using the Leaky integrate and fire (LIF) neurons, which do not incorporate the underlying molecular signaling cascade. 
 
-\clearpage
+I found a frog ORN neuron model for signal transduction [@dougherty05computational], which was build upon a number of previous models, and this model is also incorporates calcium based adaptation response of frog ORNs. I found another experimental study which displayed electrophysiological recordings from frog ORNs and showed action potentials as well as the underlying transduction waveforms [@reisert99adaptation]. In this report, I am showing my efforts so far to extend the ORN transduction model by adding neural firing abilities using the Morris-Leccar (ML) model to match the experimental recordings of frog ORN. 
+
+ML neuron model use two non-linear processes, $\rm V_{ML}$ and `nK`, to model membrane potential and $K^+$-ion channel operations, respectively. I have included an additional calcium-dependent mathematical process `CaFR` which affects the firing rate of ML spikes. `CaFR` is functionally analogous to calcium-activated chloride channels which modulates the firing-rate encoding in other ORNs [@zak18calciumactivated]. The spiking-ORN model developed in this study matches adaptation response and neural spike-dynamics of the frog ORN qualitatively, which I then used to predict the optimal breathing frequency suitable for sustained sniffing for a given odor concentration.
+
 
 # Methods
 
@@ -131,7 +135,6 @@ I_{\rm leak} &= {\rm gl} \cdot ({\rm vl} - \mathbf{V_{ORN}})
 
 $\mathbf{V_{ORN}}$ is a sum of the resultant transduction voltages (cap=0.0039) and spike-voltage (simulated for generating ML spikes see $\S$\@ref(ML)), which is connected through (revCp=0.3), and the resulting leak current would be $I_{\rm leak}$ (with gl=4.9195, vl=-44.0413). $I_{\rm Cl(Ca)}$ is an outward chlorine current through $Ca^{2+}$ activated chloride channels (Ca(Cl)) with parameters : clmax=0.9397, vcl=-7.7902 hmc2=2.7678, n2=3.1128.
 
-
 ## ML spikes {#ML}
 
 Alter Morris-Lecar (ML) model is used to generate fast voltage dynamics to represent action potential in ORN to match experimental data [@reisert99adaptation].
@@ -188,7 +191,6 @@ Figure-\@ref(fig:MLspkORN) compares transduction voltages of a non-spiking ORN (
 ```{r MLspkID, out.width = "80%", fig.cap="Identifying ML-spikes to indicate an event responses of various stimulus concentrations"}
 knitr::include_graphics(c('figs/v1/fig_ML_spikes_ID.png')) 
 ```
-
 
 ## Sniffing experiment
 
@@ -247,13 +249,11 @@ Figure-\@ref(fig:rSen)(a) shows number of spikes during the first-sniff (peak-co
 
 ### ORN sensitivity vs brerathing frequency
 
-Figure-\@ref(fig:rSen)(b) shows peak and steady-state sniffing sensitivity for a given breathing frequency, and the range between 20 to 30 breaths/min shows optimal sniffing sensitivity for higher concentration stimulus. See $\S$\@ref(CD)(F) for discussion over defining ORN sensitivity.
-
-Raw signals in Appendix C.
+Figure-\@ref(fig:rSen)(b) shows peak and steady-state sniffing sensitivity for a given breathing frequency, and the range between 20 to 30 breaths/min shows optimal sniffing sensitivity for higher concentration stimulus. See $\S$\@ref(CD)(F) for discussion over defining ORN sensitivity. (Raw signals for the data-points are in Appendix C)
 
 # Discussion and Conclusions {#CD}
 
-A.  **Transduction current simulation matches experimental data in shape but not in peak-response**
+A.  **Transduction simulation matches experimental data in shape but not in peak-response**
 
 Peak cellular current in ORN transduction simulation (Fig-\@ref(fig:txCon),\@ref(fig:txAdp)) is lower in amplitude as compared to the experimental data (Fig-\@ref(fig:r99f24)). However, both matches in overall shape and trends. This difference is inherited from the ORN model I used from previous study [@dougherty05computational], which provides various sets of fitted parameters for ORN model and I used the one suitable for Ca-based adaptation simulation. Since my goal of this study was to introduce action potentials in ORN, I did not try to match them. To match the peak current, one can use the parameters optimized for ORN concentration response [@dougherty05modeldb].
 
@@ -345,15 +345,20 @@ knitr::include_graphics(c('figs/sniff/fig_spk_sniffing_50bpm.png'))
 
 # Appendix D : Codes {-}
 
-## Matlab simulation {-}
+## Parameters {-}
 
-simulate_ORN.m
+```{octave, eval=FALSE, echo=TRUE, code=xfun::read_utf8('../simulation_parameters.m'), }
+```
+
+## ORN Simulation  {-}
+
+```{octave, eval=FALSE, echo=TRUE, code=xfun::read_utf8('../simulate_ORN.m'), }
+```
 
 ## All other codes {-}
 
 - All Matlab simulation script, Matlab scripts for all figures, tex/md files for generating this report and figures files are available here : 
-  + <[Google Drive](https://drive.google.com/drive/folders/1N4nMSW9fY1oOydNJQu4aa85tXOV_euu4?usp=sharing)>
-  + <[github.com/shivanshdave](https://drive.google.com/drive/folders/1N4nMSW9fY1oOydNJQu4aa85tXOV_euu4?usp=sharing)>
+  + <[github.com/shivanshdave](https://github.com/shivanshdave/Spiking_ORN)>
 
 # References
 
