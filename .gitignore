@@ -10,7 +10,6 @@
 # R - Report
 .Rproj.user
 *.pdf
-*.tex
 *.Rhistory
 **/*_cache/*
 **/*_files/*
