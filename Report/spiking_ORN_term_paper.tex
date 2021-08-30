@@ -36,7 +36,7 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \hypersetup{
-  pdftitle={Modeling of spiking olfactory receptors using a molecular transduction model},
+  pdftitle={Modeling of spiking olfactory receptor neuron (ORN) using a mechanistic odor-transduction model},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
 \urlstyle{same} % disable monospaced font for URLs
@@ -134,7 +134,7 @@
 \newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{#1}\break}
 \newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
 
-\title{Modeling of spiking olfactory receptors using a molecular transduction model}
+\title{Modeling of spiking olfactory receptor neuron (ORN) using a mechanistic odor-transduction model}
 \author{Shivansh Dave\\
 Biology Department, Case Western Reserve University\\
 \href{mailto:shivansh@case.edu}{\nolinkurl{shivansh@case.edu}}}
@@ -156,25 +156,25 @@ Biology Department, Case Western Reserve University\\
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
 
-The special sense of smell originates as chemoreception at olfactory receptor neurons (ORN) in olfactory epithelium in the vertebrate nose. Humans have around 10-20 million ORNs located in the nasal cavity, all exposed to outside environment unlike any other neurons. This makes ORNs vulnerable of external damages and results into ORNs having very high turnover rate, continuously regenerating from stem cells, to maintain olfactory function. This makes ORNs one of the very few types of neurons capable of regenerating throughout the lifespan.
+The special sense of smell originates as chemoreception at olfactory receptor neuron (ORN) in the olfactory epithelium in vertebrate nose and in the antennae in invertebrates. Molecular mechanisms for olfaction and its neural organization principles are conserved across species (Ache and Young 2005). Humans have around 10-20 million ORNs located in the nasal cavity, all exposed to the outside environment, unlike any other neurons. This makes ORNs vulnerable of external damages and results into ORNs having very high turn over rate, and require continuous regenerating from stem cells to maintain olfactory function. Thus, ORNs are one of the very few types of neurons capable of regenerating throughout the lifespan.
 
-Each ORN expresses just one type of olfactory receptors (OR), and all the ORNs expressing a same receptor project their axon terminals to a same region in olfactory bulb, forming a glomerulus. Multiple odorants can bind to a same type of olfactory receptor, and also one odorant type can bind to multiple olfactory receptor types, which allows a large number of unique possibilities. As a result of such complex computations, humans are capable of discriminating more than 1 Trillion smells (Bushdid et al. 2014).
+For vertebrates, each ORN expresses the same type of olfactory receptors (OR), and all the ORNs expressing a same receptor type project their axon terminals to a same region in olfactory bulb, forming a glomerulus. Multiple odorants can bind to a same type of olfactory receptor, and also, a single odorant can bind to multiple olfactory receptor types, which allows a large number of unique combinations. As a result, humans are capable of discriminating more than 1 Trillion smell stimuli (Bushdid et al. 2014).
 
-Olfactory receptors are the G protein-coupled receptors (GPCR), metabotropic type of membrane receptors, which change their structure upon odorant binding and trigger a molecular signaling cascade which finally lead to firing an action potential. There are many modeling studies to mechanistically explain the molecular process involved in signal transduction (i.e.~from odorant to membrane potential). Most often these studies do not model signal encoding part (i.e.~odor-signal to spike-response of an ORN). However, there are many independent models present to just explain the neural-spike response of these ORNs often using the Leaky integrate and fire (LIF) neurons, which do not incorporate the underlying molecular signaling cascade.
+Olfactory receptors (OR) are the G-protein coupled receptors (GPCR), metabotropic type of membrane receptors, which change their structure upon odorant binding and trigger a molecular signaling cascade which may finally lead to firing an action potential. There are many modeling studies to mechanistically explain the molecular processes involved in signal transduction (i.e.~from odorant to membrane potential) (Gu, Lucas, and Rospars 2009). Most often these studies do not model olfactory signal encoding (i.e.~the spike-response of an ORN). However, there are many independent models available to just explain the neural-spike response of these ORNs, often using the Leaky integrate and fire (LIF) neurons, which do not incorporate the underlying molecular signaling cascade (Levakova et al. 2019).
 
-I found a frog ORN neuron model for signal transduction (Dougherty, Wright, and Yew 2005), which was build upon a number of previous models, and this model is also incorporates calcium based adaptation response of frog ORNs. I found another experimental study which displayed electrophysiological recordings from frog ORNs and showed action potentials as well as the underlying transduction waveforms (Reisert and Matthews 1999). In this report, I am showing my efforts so far to extend the ORN transduction model by adding neural firing abilities using the Morris-Leccar (ML) model to match the experimental recordings of frog ORN.
+I found a frog ORN neuron model for signal transduction (Dougherty, Wright, and Yew 2005), which was build upon multiple previous models, which incorporates calcium based adaptation response of frog ORNs. I found another experimental study which displayed raw electrophysiological recordings from frog ORNs and showed action potentials as well as the underlying transduction waveforms (Reisert and Matthews 1999). In this report, I am showing my efforts so far to extend the ORN transduction model by adding neural firing abilities using the Morris-Leccar (ML) model to match spike-response of the experimental recordings of frog ORN.
 
-ML neuron model use two non-linear processes, \(\rm V_{ML}\) and \texttt{nK}, to model membrane potential and \(K^+\)-ion channel operations, respectively. I have included an additional calcium-dependent mathematical process \texttt{CaFR} which affects the firing rate of ML spikes. \texttt{CaFR} is functionally analogous to calcium-activated chloride channels which modulates the firing-rate encoding in other ORNs (Zak et al. 2018). The spiking-ORN model developed in this study matches adaptation response and neural spike-dynamics of the frog ORN qualitatively, which I then used to predict the optimal breathing frequency suitable for sustained sniffing for a given odor concentration.
+ML neuron model use two non-linear processes \(\rm V_{ML}\) and \texttt{nK} to model membrane potential and \(K^+\)-ion channel operations, respectively. I have included an additional calcium-dependent mathematical process \texttt{CaFR} which modulates the firing rate of ML spikes. \texttt{CaFR} is functionally analogous to calcium-activated chloride channels which alters the firing-rate encoding in ORNs (Zak et al. 2018). The spiking-ORN model developed in this study matches adaptation-response and neural spike-dynamics of the frog ORN qualitatively, which I then used to predict an optimal breathing frequency range suitable for a sustained sniffing at various odor concentrations.
 
 \hypertarget{methods}{%
 \section{Methods}\label{methods}}
 
-Mathematical model and its parameters for simulating frog olfactory receptor neuron was used for signal-transduction modeling (Dougherty, Wright, and Yew 2005). The existing simulation script found on ModelDB (Dougherty 2005) was uploaded in 2005 and allows the user to tweak parameters and stimulus conditions in an interactive way. It then generates plain text-files containing all configurations and simulation response, which can be read by other programs. It did not work out-of-the box for my current version of MATLAB R2021a, as it used deprecated functions. I reimplemented their odor-transaction model using a set of parameters optimized for matching ORN adaptation responses. I introduced three additional ODEs to generate spikes to match ORN's responses found in a separate study (Reisert and Matthews 1999).
+I use a previously developed mathematical model and its parameters for simulating signal-transduction in frog olfactory receptor neuron (ORN) (Dougherty, Wright, and Yew 2005). The existing simulation scrip found on ModelDB (Dougherty 2005) was uploaded in 2005 and allows the user to tweak model parameters and stimulus conditions in an interactive way. It then generates plain text-files containing all configurations and simulation response, which can be read by other programs. It did not work out-of-the box for my current version of MATLAB (i.e.~R2021a), as it used deprecated functions. I reimplemented their odor-transaction model using a set of parameters optimized for matching ORN adaptation responses. I introduced three additional processes to generate and match ORN's spike-responses found in a separate study (Reisert and Matthews 1999).
 
 \hypertarget{spiking-orn-model}{%
 \subsection{Spiking ORN model}\label{spiking-orn-model}}
 
-Figure-\ref{fig:model} represents a complete diagram explaining the spiking ORN model with some of the parameters. Blue nodes reimplemented from the transduction-model; red nodes are introduced in this study.
+Figure-\ref{fig:model} represents a complete diagram explaining the spiking ORN model with its parameters. Blue nodes are reimplemented from the transduction-model and red nodes are introduced in this study.
 
 \begin{figure}
 
@@ -182,7 +182,7 @@ Figure-\ref{fig:model} represents a complete diagram explaining the spiking ORN 
 
 }
 
-\caption{Spiking ORN mechanistic model diagram}\label{fig:model}
+\caption{Spiking ORN mechanistic model and parameters}\label{fig:model}
 \end{figure}
 
 Olfactory receptor neuron (ORN) transduction model parameters (blue nodes in Fig-\ref{fig:model})
@@ -196,13 +196,13 @@ Olfactory receptor neuron (ORN) transduction model parameters (blue nodes in Fig
 \item
   \textbf{cAMP} : Cyclic adenosine monophosphate (AMP) proportion
 \item
-  \textbf{Ca} : cytosolic free \(Ca^{2+}\) ions
+  \textbf{Ca} : Cytosolic free \(Ca^{2+}\) ions
 \item
   \textbf{IX} : \(Ca^{2+}\)-dependent intermediary substance proportion
 \item
   \textbf{CaCaM} : \(Ca^{2+}\)-calmodulin proportion
 \item
-  \textbf{aCaMK} : active proportion of \textbf{CaCaM}-dependent protein kinase (CaMK)
+  \textbf{aCaMK} : Active-state proportion of CaCaM-dependent protein kinase (CaMK)
 \item
   \textbf{V\_ORN} : ORN intracellular voltage
 \end{itemize}
@@ -218,30 +218,30 @@ Spiking mechanism model parameters implemented in this study (red nodes in Fig-\
 \item
   \textbf{nK} : ML channel for \(K^+\)-ions activation proportion
 \item
-  \textbf{CaFR} : \(Ca^{2+}\)-dependent ML spike firing-rate modulation
+  \textbf{CaFR} : \(Ca^{2+}\)-dependent ML firing-rate modulation
 \item
   \textbf{I\_ORN} : ORN membrane current prediction
 \end{itemize}
 
-\hypertarget{orn-odor-transduction}{%
-\subsection{ORN : odor-transduction}\label{orn-odor-transduction}}
+\hypertarget{signal-transduction}{%
+\subsection{Signal-transduction}\label{signal-transduction}}
 
 \begin{figure}
 
-{\centering \subfloat[Cell current raw traces\label{fig:txCon-1}]{\includegraphics[width=0.5\linewidth]{figs/v1/fig_txn_compare_conc} }\subfloat[Quantification\label{fig:txCon-2}]{\includegraphics[width=0.5\linewidth]{figs/v1/fig_txn_compare_conc_quant} }
+{\centering \subfloat[Cell current (I-ORN) traces\label{fig:txCon-1}]{\includegraphics[width=0.5\linewidth]{figs/v1/fig_txn_compare_conc} }\subfloat[Quantification\label{fig:txCon-2}]{\includegraphics[width=0.5\linewidth]{figs/v1/fig_txn_compare_conc_quant} }
 
 }
 
 \caption{Transduction comparison for various odor concentration}\label{fig:txCon}
 \end{figure}
 
-Figure-\ref{fig:txCon}(a) shows odor-transduction response for a variable concentration 1 second long stimulus pulse. And, (b) compares to plateau current (measured at 1.5 sec) and peak current for a given stimulus. (Experimental data in Fig-\ref{fig:r99f24})
+Figure-\ref{fig:txCon}(a) shows odor-transduction response for 1 second long stimulus pulse at various concentrations. And, (b) compares the plateau current (measured at 1.5 sec) and peak current for a given stimulus. (Experimental data in Fig-\ref{fig:r99f24})
 
 \hypertarget{ligand-receptor-binding-and-g-protein-activation-modeling}{%
 \paragraph*{Ligand-receptor binding and G-protein activation modeling}\label{ligand-receptor-binding-and-g-protein-activation-modeling}}
 \addcontentsline{toc}{paragraph}{Ligand-receptor binding and G-protein activation modeling}
 
-In the equation for a single pulse of odor-stimulus (\(O_{\rm stim}\)), \textbf{\emph{H}(.)} is the Heaviside step function and \textbf{od} represents odor-concentration. Parameters for the odorant-binding proportion \(\mathbf{bLR}\) equation are the following : k1=0.1143, r1=3.1663, and normalized maximum receptor count, Rtot = 1. Similarly, for \(\mathbf{aG}\), Gtot=1, k2=12.9344 and r2=6.5597.
+In the equation for a single pulse of odor-stimulus (\(O_{\rm stim}\)), \(H(.)\) is the Heaviside step function and od represents odor-concentration. Parameters for the odorant-binding proportion \(\mathbf{bLR}\) equation are the following : k1=0.1143, r1=3.1663, and normalized maximum receptor count, Rtot = 1. Similarly, for \(\mathbf{aG}\), Gtot=1, k2=12.9344 and r2=6.5597.
 
 \begin{equation}\label{eq:tx1}
 \begin{split}
@@ -261,10 +261,10 @@ O_{\rm stim} &= {\rm od} \cdot [ H(t-t_0) - H(t-t_1) ];\ \ \ \ \  \text{(single 
 
 }
 
-\caption{Transduction comparison for adaptation}\label{fig:txAdp}
+\caption{Adaptation in transduction comparison for the test-pulse of different concentrations}\label{fig:txAdp}
 \end{figure}
 
-Figure-\ref{fig:txAdp} demonstrates olfactory adaptation due to a 4 seconds long low concentration (5uM) pre-stimulus pulse. The following test-pulse of 1 second shows that it requires about 4 times stronger (20uM) pulse to get similar current output due to sensory adaptation. (Experimental data in Fig-\ref{fig:r99f24})
+Figure-\ref{fig:txAdp} demonstrates olfactory adaptation due to a 4 seconds long low concentration (5uM) pre-stimulus pulse. Response of the following test-pulse of 1 second shows that it requires about 4 times stronger (20uM) stimulus to get similar current output, demonstrating sensory adaptation. (Experimental data in Fig-\ref{fig:r99f24})
 
 \begin{equation}\label{eq:tx2}
 \begin{split}
@@ -278,9 +278,9 @@ Figure-\ref{fig:txAdp} demonstrates olfactory adaptation due to a 4 seconds long
 \end{split}
 \end{equation}
 
-Equations-\eqref{eq:tx2} are responsible for intracellular calcium mediated signaling that is responsible for transduction adaptation. Here are the parameters used : pd=7.5749, smax=45.5118, kinh=1.0018, ninh=1.3081 (for \(\mathbf{cAMP}\)); inf=1.7619, cc1=0.7750, cc2=26.3950 (for \(\mathbf{Ca}\) and \(\mathbf{CaCaM}\)); cnmax=0.9663, vcng=0.0106, hmc1=1.4829, n1=3.1844, inhmax=3.5697, kinhcng=0.5181, ninhcng=1.4511 (for \(I_\mathbf{CNG}\)), ef=2.7583, kI=10.0453, nI=1.9848 (for \(J_\mathbf{NCX}\)); ck1=8.5342, ck2=0.3069 (for \(\mathbf{aCaMK}\)); cx1=1.2307, cx2=10.9297 (for \(\mathbf{IX}\)).
+Equations-\eqref{eq:tx2} are responsible for intracellular calcium mediated signaling that is responsible for transduction adaptation. \(I_{\rm CNG}\) represents depolarizing \(Ca^{2+}\)-ion current through cyclic nucleotide-gated (CNG) channels, and \(J_\mathbf{NCX}\) is the \(Ca^{2+}\)-ions flux through Na/Ca exchanger (NCX). Whereas, \(\mathbf{IX}\) is a mathematical \(Ca^{2+}\)-ion stimulated intermediate substance.
 
-Here, \(I_{\rm CNG}\) represents depolarizing \(Ca^{2+}\)-ion current through cyclic nucleotide-gated (CNG) channels, and \(J_\mathbf{NCX}\) is the \(Ca^{2+}\)-ions flux through Na/Ca exchanger (NCX). Whereas, \(\mathbf{IX}\) is a mathematical \(Ca^{2+}\)-ion stimulated intermediate substance.
+Here are the parameters used : pd=7.5749, smax=45.5118, kinh=1.0018, ninh=1.3081 (for \(\mathbf{cAMP}\)); inf=1.7619, cc1=0.7750, cc2=26.3950 (for \(\mathbf{Ca}\) and \(\mathbf{CaCaM}\)); cnmax=0.9663, vcng=0.0106, hmc1=1.4829, n1=3.1844, inhmax=3.5697, kinhcng=0.5181, ninhcng=1.4511 (for \(I_\mathbf{CNG}\)), ef=2.7583, kI=10.0453, nI=1.9848 (for \(J_\mathbf{NCX}\)); ck1=8.5342, ck2=0.3069 (for \(\mathbf{aCaMK}\)); cx1=1.2307, cx2=10.9297 (for \(\mathbf{IX}\)).
 
 \hypertarget{effector-channel-activity-and-cell-currents-for-transduction}{%
 \paragraph*{Effector Channel Activity and cell currents for transduction}\label{effector-channel-activity-and-cell-currents-for-transduction}}
@@ -296,12 +296,12 @@ I_{\rm leak} &= {\rm gl} \cdot ({\rm vl} - \mathbf{V_{ORN}})
 \end{split}
 \end{equation}
 
-\(\mathbf{V_{ORN}}\) is a sum of the resultant transduction voltages (cap=0.0039) and spike-voltage (simulated for generating ML spikes see \(\S\)\ref{ML}), which is connected through (revCp=0.3), and the resulting leak current would be \(I_{\rm leak}\) (with gl=4.9195, vl=-44.0413). \(I_{\rm Cl(Ca)}\) is an outward chlorine current through \(Ca^{2+}\) activated chloride channels (Ca(Cl)) with parameters : clmax=0.9397, vcl=-7.7902 hmc2=2.7678, n2=3.1128.
+\(\mathbf{V_{ORN}}\) is a sum of the resultant transduction voltages (with cap=0.0039). ML Spike-voltage (see \(\S\)\ref{ML}) is connected through (revCp=0.3). The resulting total leak current is \(I_{\rm leak}\) (with gl=4.9195, vl=-44.0413). \(I_{\rm Cl(Ca)}\) is an outward chlorine current through \(Ca^{2+}\) activated chloride channels (Ca(Cl)) (with parameters : clmax=0.9397, vcl=-7.7902 hmc2=2.7678, n2=3.1128).
 
 \hypertarget{ML}{%
 \subsection{ML spikes}\label{ML}}
 
-Alter Morris-Lecar (ML) model is used to generate fast voltage dynamics to represent action potential in ORN to match experimental data (Reisert and Matthews 1999).
+Modified Morris-Lecar (ML) model is used to generate fast voltage dynamics to represent action potential in ORN to match experimental data (Reisert and Matthews 1999).
 
 \begin{figure}
 
@@ -312,11 +312,11 @@ Alter Morris-Lecar (ML) model is used to generate fast voltage dynamics to repre
 \caption{Altered Morris-Lecar model for action potentials in ORN}\label{fig:MLspk}
 \end{figure}
 
-Figure-\ref{fig:MLspk} shows all three components (with their equations below) used to model ML spikes in ORN. Model equations and parameters used in \(\mathbf{V_{ML}}\) and \(\mathbf{nK}\) are from Anderson, Ermentrout, and Thomas (2015). vL is changed from -60mV to -44mV to match the resting potential of ORN model. (Parameters:Eq-\eqref{eq:MLpar}, Functions:Eq-\eqref{eq:MLfxn}).
+Figure-\ref{fig:MLspk} shows all three components used to model ML spikes in ORN (Equation- \eqref{eq:MLeq}). Model equations and parameters used in \(\mathbf{V_{ML}}\) and \(\mathbf{nK}\) are from Anderson, Ermentrout, and Thomas (2015). vL is changed from -60mV to -44mV to match the resting potential of ORN model. (ML parameters:Eq-\eqref{eq:MLpar}, ML functions:Eq-\eqref{eq:MLfxn}).
 
-Also, \(\mathbf{CaFR}\) is introduced here to model adaption in firing rate for spiking ORN and added to ML model via \(ct\) (with maxFR=50, indicating 50Hz as a maximum firing rate). Other parameters : p=2, n=100, m=1. For ML spikes, I am also adding intracellular \(Ca^{2+}\)-driven current, \(I_{\rm Ca}\) with gain gIca=10, and other ionic currents during a spiking event, \(I_{\rm ions}\) with spkThr=-43 and gain gIion = 22.
+\(\mathbf{CaFR}\) is introduced to model adaption-encoding in firing rate for spiking ORN and added to the ML model via \(ct\) (with maxFR=50, indicating 50Hz as a maximum firing rate of ORN). Other parameters are p=2, n=100, and m=1. I am also adding two values dependent on the transduction model : intracellular \(Ca^{2+}\)-driven current, \(I_{\rm Ca}\) (with gain gIca=10), and other ionic currents during a spiking event, \(I_{\rm ions}\) (with spkThr=-43mV and gain gIion=22).
 
-\begin{equation}
+\begin{equation} \label{eq:MLeq}
 \begin{split}
 \frac{d\ \mathbf{V_{ML}}}{dt} &= \frac{ct}{\rm C_m} \cdot [ I_{\rm ions} + I_{\rm Ca} - {\rm gL} \cdot (\mathbf{V_{ML}} - {\rm v_L}) - {\rm gK} \cdot \mathbf{nK} \cdot (\mathbf{V_{ML}}-{\rm v_K}) \\
 &\ \  - {\rm gCa} \cdot m_\infty(\mathbf{V_{ML}}) \cdot (\mathbf{V_{ML}}- {\rm v_{Ca}}) \ ] \\
@@ -356,7 +356,7 @@ m_\infty&(v) = \frac12\left(1+ \tanh(\frac{v-v_a}{vb})\right) \\
 \caption{Resuling ORN current due to Morris-Lecar spikes}\label{fig:MLspkORN}
 \end{figure}
 
-Figure-\ref{fig:MLspkORN} compares transduction voltages of a non-spiking ORN (orange) with a spiking ORN (blue). The first panel is ML-voltage (\(V_{\rm ML}\)) which is added back to ORN transduction simulation (into \(V_{\rm ORN}\)) and eventually the predicted current (\(I_{\rm ORN}\)) will have the effects of ML spikes. Local-minima identification algorithm is used to identify spikes in ORN for the further study.
+Figure-\ref{fig:MLspkORN} compares transduction voltages of a non-spiking ORN transduction (orange) with a spiking ORN (blue). The first panel is ML-voltage (\(V_{\rm ML}\)), which is added back to ORN transduction simulation (into \(V_{\rm ORN}\)) and eventually the predicted current (\(I_{\rm ORN}\)) will display the effects of ML spikes. Local-minima identification algorithm is used to identify spikes in ORN for the further study (as marked in last panel). Figure-\ref{fig:MLspkID} shows example of spike-identification for a low (20uM) and high (300uM) stimulus.
 
 \begin{figure}
 
@@ -364,7 +364,7 @@ Figure-\ref{fig:MLspkORN} compares transduction voltages of a non-spiking ORN (o
 
 }
 
-\caption{Identifying ML-spikes to indicate an event responses of various stimulus concentrations}\label{fig:MLspkID}
+\caption{Robust identification of ML-spikes across stimulus concentration range}\label{fig:MLspkID}
 \end{figure}
 
 \hypertarget{sniffing-experiment}{%
@@ -379,13 +379,15 @@ Figure-\ref{fig:MLspkORN} compares transduction voltages of a non-spiking ORN (o
 \caption{Example stimulus of 30 breaths/min used in sniffing experiment}\label{fig:pulse}
 \end{figure}
 
-To simulate breathing, I am using continuous pulses of 33\% duty cycle (Zak et al. 2018) and using 4 different concentrations (10,20,50 and 300 uM). I change the time-period (T) to match a given breathing frequency (breaths/minute). First pulse's response is considered as peak-response and last (i.e.~fifth) pulse's response is considered as steady-state response as the response does not change after first two pulses (see Appendix C). Figure-\ref{fig:pulse} displays the odor-stimulus for 30bpm used in frog spiking-ORN sniffing experiments.
+To simulate breathing, I am using continuous pulses of 33\% duty cycle (Zak et al. 2018) of 4 different concentrations (10,20,50 and 300 uM). First-pulse's response is the peak-response and fifth-pulse's response is taken as the steady-state response as the response does not change after the first two pulses (see Appendix C). Figure-\ref{fig:pulse} displays the odor-stimulus for 30bpm used in frog spiking-ORN sniffing experiments.
 
 \hypertarget{results}{%
 \section{Results}\label{results}}
 
 \hypertarget{spiking-in-orn}{%
 \subsection{Spiking in ORN}\label{spiking-in-orn}}
+
+Spiking in the ORN model was achieved. Figure-\ref{fig:rORN} shows a simulation of three stimulus of two pulses each with varying concentrations (blue-30,5; red-5,30; yellow-0,0). Effect of adaption is higher in blue, which has stronger stimulus (30uM) first and followed by 5uM pulse. Identified spikes are labeled with an upwards pointing triangle in \(I_{\rm ORN}\) panel.
 
 \begin{figure}
 
@@ -396,10 +398,8 @@ To simulate breathing, I am using continuous pulses of 33\% duty cycle (Zak et a
 \caption{Spiking ORN operation and key underlying component traces}\label{fig:rORN}
 \end{figure}
 
-Spiking in ORN model was achieved. Figure-\ref{fig:rORN} shows a simulation of three stimulus of two pulses each with varying concentrations (blue-30,5; red-5,30; yellow-0,0). Effect of adaptaion is higher in blue which has stronger stimulus (30uM) first and followed by 5uM pulse. Identified spikes are labeled with an upwards pointing triangle in I\_ORN panel.
-
-\hypertarget{response-to-concentration-changes}{%
-\subsubsection{Response to concentration changes}\label{response-to-concentration-changes}}
+\hypertarget{response-to-the-stimulus-concentration}{%
+\subsubsection{Response to the stimulus concentration}\label{response-to-the-stimulus-concentration}}
 
 \begin{figure}
 
@@ -410,10 +410,10 @@ Spiking in ORN model was achieved. Figure-\ref{fig:rORN} shows a simulation of t
 \caption{Resulting spiking ORN for different concentrations}\label{fig:rCon}
 \end{figure}
 
-Figure-\ref{fig:rCon}(a) shows simulation traces of spiking ORN's response for varying concentration stimulus pulses. In (b) panel spike-rate, spike-count and latency to the first spike is quantified for various concentrations for ORN Spike-response profiling. With increasing stimulus strength, firing-rate and spike-count increases and latency decreases before reaching to the steady-state value. (Experimental data in Fig-\ref{fig:r99f13})
+Figure-\ref{fig:rCon}(a) shows simulation traces of spiking ORN's response for varying concentration stimulus pulses. Spike-rate, spike-count and latency to the first spike is quantified in (b) for various concentrations and can be used for ORN Spike-response profiling. With increasing stimulus strength, firing-rate and spike-count increases and latency decreases before reaching to the steady-state value. (Experimental data in Fig-\ref{fig:r99f13})
 
-\hypertarget{response-to-duration-changes}{%
-\subsubsection{Response to duration changes}\label{response-to-duration-changes}}
+\hypertarget{response-to-the-stimulus-duration}{%
+\subsubsection{Response to the stimulus duration}\label{response-to-the-stimulus-duration}}
 
 \begin{figure}
 
@@ -421,13 +421,17 @@ Figure-\ref{fig:rCon}(a) shows simulation traces of spiking ORN's response for v
 
 }
 
-\caption{Spiking ORN response for stimulus duration}\label{fig:rDur}
+\caption{Spiking ORN response for various stimulus duration}\label{fig:rDur}
 \end{figure}
 
-Figure-\ref{fig:rDur} shows ORN-transduction and spiking for a single 20 uM stimulus with a varied amount of lengths. For my model, as short as 0.1 second stimulus is sufficient to generate spikes in ORN, with latency increasing as compared to higher concentrations. Stimulus of 0.5 seconds or longer shows same response in terms of peak transduction current (a), and spike-count, frequency and latency (b).
+Figure-\ref{fig:rDur} shows ORN-transduction and spiking for a single 20 uM stimulus with a varied amount of lengths. As short as 0.1 second stimulus is sufficient to generate spikes in ORN, with an increased latency. Stimulus of 0.5 seconds or longer shows same response in terms of peak transduction current (\ref{fig:rDur}-a), spike-count, spike-frequency and latency (\ref{fig:rDur}-b).
 
-\hypertarget{response-to-adaptation}{%
-\subsubsection{Response to Adaptation}\label{response-to-adaptation}}
+\clearpage
+
+\hypertarget{orn-adaptation-and-spike-response}{%
+\subsubsection{ORN adaptation and spike-response}\label{orn-adaptation-and-spike-response}}
+
+To find the effect of adaptation and to compare it with experimental data shown in fig-\ref{fig:r99f5}, I stimulated the spiking ORN with a 4 second pre-stimulus pulse of variable concentrations followed by an 1 second long test pulse of 20 uM odor concentration. Figure-\ref{fig:rAdp} shows the result which matches the experimental data. A pre-stimulus of 2 uM or stronger does not yield any spikes for the test-stimulus, though they show transduction response for the test-pulse. Spike counts get reduced with increasing concentration of pre-stimulus.
 
 \begin{figure}
 
@@ -435,47 +439,58 @@ Figure-\ref{fig:rDur} shows ORN-transduction and spiking for a single 20 uM stim
 
 }
 
-\caption{Effect of adaptation on ORN spiking}\label{fig:rAdp}
+\caption{Effect of adaptation on ORN spiking response}\label{fig:rAdp}
 \end{figure}
 
-To find the effect of adaptation and to compare it with experimental data Fig-\ref{fig:r99f5}, I simulated spiking ORN with variable concentration pre-stimulus for 4 seconds followed by 1 second test stimulus of 20 uM pulse. Figure-\ref{fig:rAdp} shows the result which matches the experimental data. 2 uM or more concentration pre-stimulus does not yield any spikes in test-stimulus. Spike frequency and counts get reduced with increasing concentration of pre-stimulus.
+\hypertarget{sniffing-experiment-1}{%
+\subsection{Sniffing experiment}\label{sniffing-experiment-1}}
 
-\hypertarget{optimal-sniffing-frequency}{%
-\subsection{Optimal sniffing frequency}\label{optimal-sniffing-frequency}}
-
-A hypothesis I am testing testing here is this :
+A hypothesis I am testing testing for the sniffing experiment is the following :
 
 \begin{quote}
-Higher breathing frequency will have higher adaptation response and hence, lower steady-state response in terms of spike-count.
+A higher breathing frequency will have higher adaptation and, hence, a lower steady-state response in ORN.
 \end{quote}
 
 \begin{figure}
 
-{\centering \subfloat[Spike-count\label{fig:rSen-1}]{\includegraphics[width=0.5\linewidth]{figs/v1/fig_sniff_freq_FR_tuning_raw} }\subfloat[sniffing sensitivity\label{fig:rSen-2}]{\includegraphics[width=0.5\linewidth]{figs/v1/fig_sniff_freq_FR_tuning_gain} }
+{\centering \includegraphics[width=0.5\linewidth]{figs/v1/fig_sniff_freq_FR_tuning_raw} 
 
 }
 
-\caption{Count}\label{fig:rSen}
+\caption{Spike counts for various breathing rate (breaths/min)}\label{fig:rSen1}
 \end{figure}
 
-Figure-\ref{fig:rSen}(a) shows number of spikes during the first-sniff (peak-count) vs last-sniff (steady-state), and steady-state spike counts steadiely decrease with increasing breathing frequency.
+To address this question, I am quantifying peak and steady-state spike-response using the spike-count as the ORN response indicator. Figure-\ref{fig:rSen1} shows number of spikes during the first-sniff (peak-count) vs the last-sniff (steady-state). The steady-state spike counts steadily decrease with increasing breathing frequency, which supports the hypothesis.
 
-\hypertarget{orn-sensitivity-vs-brerathing-frequency}{%
-\subsubsection{ORN sensitivity vs brerathing frequency}\label{orn-sensitivity-vs-brerathing-frequency}}
+\hypertarget{optimal-sniffing-frequency}{%
+\subsubsection{Optimal sniffing frequency}\label{optimal-sniffing-frequency}}
 
-Figure-\ref{fig:rSen}(b) shows peak and steady-state sniffing sensitivity for a given breathing frequency, and the range between 20 to 30 breaths/min shows optimal sniffing sensitivity for higher concentration stimulus. See \(\S\)\ref{CD}(F) for discussion over defining ORN sensitivity. (Raw signals for the data-points are in Appendix C)
+The optimal frequency would the highest breathing frequency with little loss of ORN sensitivity. See \(\S\)\ref{CD}(F) for the discussion over defining ORN sensitivity.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.5\linewidth]{figs/v1/fig_sniff_freq_FR_tuning_gain} 
+
+}
+
+\caption{ORN sensitivity for various breathing rate (breaths/min)}\label{fig:rSen2}
+\end{figure}
+
+Figure-\ref{fig:rSen2} shows peak and steady-state sniffing sensitivity for various breathing frequencies. The range between 25 to 30 breaths/min shows optimal sniffing sensitivity.
+
+Raw traces for the data-points in Figure-\ref{fig:rSen1} \& \ref{fig:rSen2} are included in Appendix C.
 
 \hypertarget{CD}{%
-\section{Discussion and Conclusions}\label{CD}}
+\section{Discussion and Conclusion}\label{CD}}
 
 \begin{enumerate}
 \def\labelenumi{\Alph{enumi}.}
 \tightlist
 \item
-  \textbf{Transduction simulation matches experimental data in shape but not in peak-response}
+  \textbf{Transduction simulation matches experimental data in terms of the response-shape but show a smaller peak current response}
 \end{enumerate}
 
-Peak cellular current in ORN transduction simulation (Fig-\ref{fig:txCon},\ref{fig:txAdp}) is lower in amplitude as compared to the experimental data (Fig-\ref{fig:r99f24}). However, both matches in overall shape and trends. This difference is inherited from the ORN model I used from previous study (Dougherty, Wright, and Yew 2005), which provides various sets of fitted parameters for ORN model and I used the one suitable for Ca-based adaptation simulation. Since my goal of this study was to introduce action potentials in ORN, I did not try to match them. To match the peak current, one can use the parameters optimized for ORN concentration response (Dougherty 2005).
+Peak cellular current in ORN transduction simulation (Fig-\ref{fig:txCon},\ref{fig:txAdp}) is lower in amplitude as compared to the experimental data (Fig-\ref{fig:r99f24}). However, both matches in overall shape and trends. This difference is inherited from the ORN model I used from the previous study (Dougherty, Wright, and Yew 2005). It provided multiple sets of fitted parameters for the ORN transduction model and I have used the set suitable for Ca-based adaptation simulation. Since my goal of this study was to introduce action potentials in ORN, I did not try to match the peak current. One can use the parameters optimized for ORN concentration response (Dougherty 2005) or modify the transduction model for matching peak-currents. Hence, I am disregarding the current scales of the spike-response simulations while matching to the raw data.
 
 \begin{enumerate}
 \def\labelenumi{\Alph{enumi}.}
@@ -485,7 +500,7 @@ Peak cellular current in ORN transduction simulation (Fig-\ref{fig:txCon},\ref{f
   \textbf{Morris-Lecar (ML) model can be integrated in mechanistic ORN model and it is different than just adding ML spikes post-simulation}
 \end{enumerate}
 
-\S\ref{ML} shows the method I used to introduce ML spikes in ORN simulations, which uses three additional ODEs integrated along with others from sensory-transduction in mutually dependent fashion. Meaning, change in ML voltage will alter species concentrations of transduction mechanisms and vice versa. Just to demonstrate how ML spikes in an ORN would look if they were added later after the transduction simulation, see Figure-\ref{fig:MLover}.
+\S\ref{ML} shows the method I used to introduce ML spikes in ORN simulations, which uses three additional ODEs integrated along with others from sensory-transduction in mutually dependent fashion. Meaning, change in ML voltage will alter species concentrations of transduction mechanisms and vice versa. Just to demonstrate how ML spikes in an ORN would look if they were added later after the transduction simulation, see Figure-\ref{fig:MLover}, which does not look realistic or match to the raw data. Hence, I have integrated ML processes along with the molecular transduction processes for my spiking ORN model to simulate realistic ORN current signals.
 
 \begin{enumerate}
 \def\labelenumi{\Alph{enumi}.}
@@ -495,7 +510,7 @@ Peak cellular current in ORN transduction simulation (Fig-\ref{fig:txCon},\ref{f
   \textbf{Spike identification works robustly for both low and high concentrations}
 \end{enumerate}
 
-Figure-\ref{fig:MLspkID} shows spike identified in a lower and higher concentration stimulus. I did not use a threshold based method to identify them but used an algorithm to find local minima in ML spikes. Primary purpose to identify spikes in ORN is to use them in stimulus-response profiling shown in Figure-\ref{fig:rCon} and \ref{fig:rSen}. Another example for robustness of spike-identification can be seen in plots in Appendix C, and especially in steady-state response (Fig-\ref{fig:f10bpmSS}).
+Figure-\ref{fig:MLspkID} shows spike identified in a lower and higher concentration stimulus. I did not use a threshold based method to identify the spikes but used an algorithm to find local minima in ML spikes. Primary purpose to identify spikes in ORN is to use them in stimulus-response profiling shown in Figure-\ref{fig:rCon} and \ref{fig:rSen1}. Another example for robustness of spike-identification can be seen in plots in Appendix C, and especially in steady-state response (Fig-\ref{fig:f10bpmSS}).
 
 \begin{enumerate}
 \def\labelenumi{\Alph{enumi}.}
@@ -505,7 +520,7 @@ Figure-\ref{fig:MLspkID} shows spike identified in a lower and higher concentrat
   \textbf{\texttt{CaFR} can modulate firing frequency dynamically to match experimental data}
 \end{enumerate}
 
-Without \texttt{CaFR} (i.e.~\({\rm CaFR}=1\) and \(\dot{\rm CaFR}=0\)) we will get a fixed firing frequency of ORN spikes (see Fig-\ref{fig:aCaFR1}). However, \texttt{CaFR} causes high rate at the beginning of the response and reducing over time to match the firing trend found in experimental data (Appendix A). Though, \texttt{CaFR} is a mathematical phenomenon, it matches the operation of certain recently found calcium-activated chloride channels which depolarize the cell and clamp the ORN firing activity (Zak et al. 2018).
+Without \texttt{CaFR} (i.e.~\({\rm CaFR}=1\) and \(\dot{\rm CaFR}=0\)) we will get a fixed firing frequency of ORN spikes (see Fig-\ref{fig:aCaFR1}). However, \texttt{CaFR} causes high spike-rate at the beginning of the stimulus and reducing over time to match the firing trend found in experimental data (Appendix A). Though, \texttt{CaFR} is a mathematical phenomenon, it matches the operation of certain recently found calcium-activated chloride channels which inhibit the cell and clamp the ORN firing activity (Zak et al. 2018). However, \texttt{CaFR} does not modulate the period in which cell is firing. That is determined by the intracellular calcium (value readout from the transduction process) dependent current, \(I_{\rm Ca}\), used in the ML spikes model.
 
 \begin{enumerate}
 \def\labelenumi{\Alph{enumi}.}
@@ -515,7 +530,7 @@ Without \texttt{CaFR} (i.e.~\({\rm CaFR}=1\) and \(\dot{\rm CaFR}=0\)) we will g
   \textbf{ML spikes in ORN model matches to high concentration responses in experimental data but not to the lower concentrations due to mismatching spike-counts}
 \end{enumerate}
 
-ORN spikes in Figure-\ref{fig:rCon} and \ref{fig:rAdp} matches the experimental data Figure-\ref{fig:r99f13}-\ref{fig:r99f5} in terms of latency and spike frequency. For my model, spike frequency is modeled after slope of calcium-intake, which reduces spike-counts for lower slope and inhibits in negative slope because my aim for this study was to match initial spike response of ORN. This prevents sustained spikes seen in Figure-\ref{fig:r99f5} during low-concentration prolong stimulus response, which is missing in my spiking ORN simulation. This also explains very high spike-counts for lower concentrations in Figure-\ref{fig:r99f13}(b). Such response can be matched likely by adding a separate dynamics activated based on something like \texttt{aG} and inhibited by \texttt{Ca}.
+ORN spikes in Figure-\ref{fig:rCon} and \ref{fig:rAdp} matches the experimental data Figure-\ref{fig:r99f13}-\ref{fig:r99f5} in terms of latency and spike frequency. For my model, spike frequency is modeled after slope of calcium-intake, which reduces spike-counts for lower slope and inhibits in negative slope. This prevents my spiking ORN model to have the sustained spikes seen in Figure-\ref{fig:r99f5} as a response of a prolong low-concentration stimulus. This also explains lack of very high spike-counts for lower concentrations as seen in Figure-\ref{fig:r99f13}(b). Such response can be matched likely by adding a separate dynamics activated based on something like \texttt{aG} and inhibited by \texttt{Ca}. I did not add them here as my aim for this study was to match initial spike response of ORN in response of stimulus-concentration and adaptation, and not the modeling of baseline ORN firing.
 
 \begin{enumerate}
 \def\labelenumi{\Alph{enumi}.}
@@ -525,13 +540,13 @@ ORN spikes in Figure-\ref{fig:rCon} and \ref{fig:rAdp} matches the experimental 
   \textbf{Sniffing sensitivity can identify suitable breathing frequency for frog ORN}
 \end{enumerate}
 
-\texttt{sniffing\ sensitivity} is defined as the spike count for a given odor-stimulus duration. So, for a same duration stimulus, higher number of spike responses in the ORN will yield higher sensitivity. Also, for same number of spike responses yield in shorter odor-stimulus will mean higher sensitivity. Increasing sensitivity with increased sniffing-frequency is a potential mechanism to optimize olfactory search duration especially in turbulent environments (Baker et al. 2018). Higher sniffing frequency can help detect odor signals in fast-changing environments.
+Sniffing sensitivity is defined as the spike count for a given odor-stimulus duration. So, for a same duration stimulus, higher number of spike responses in the ORN will yield higher sensitivity. Also, for the same number of spike responses, a shorter duration odor-stimulus will indicate higher sensitivity. Increasing sensitivity with increased sniffing-frequency is a potential mechanism to optimize olfactory search duration especially in turbulent environments (Baker et al. 2018). Higher sniffing frequency can help detect odor signals in fast-changing environments. Thus, the optimal sniffing frequency should have both the higher breathing rate and higher sniffing sensitivity, in order to navigate efficiently (e.g.~finding an odor-souce quickly) in a turbulent odor environment.
 
 \hypertarget{conclusion}{%
 \paragraph*{Conclusion}\label{conclusion}}
 \addcontentsline{toc}{paragraph}{Conclusion}
 
-In summary, ML model can be used to represent action potential responses in frog ORNs with certain limitations, and the combined model can be used for adaptation and sniffing related experiments. I found higher adaptation response for a higher breathing frequency in ORN, which is matching to my hypothesis and is consistent with the biological expectations. Such simulations can be used to understand olfactory search and other odor-guided animal behaviors.
+In summary, ML model can be used to represent action potential responses encoded in frog ORNs with certain limitations. The spiking ORN model can be used for adaptation and sniffing related experiments. I found higher adaptation response for a higher breathing frequency in ORN, which is matching to my hypothesis and is consistent with the biological expectations. Such simulations can be used to understand olfactory search strategies and other odor-guided animal behaviors.
 
 \clearpage
 
@@ -592,7 +607,7 @@ In summary, ML model can be used to represent action potential responses in frog
 
 \begin{figure}
 
-{\centering \includegraphics[width=0.7\linewidth]{figs/Appendix/supp_fig_ML_spikes_OVERLAP} 
+{\centering \includegraphics[width=0.8\linewidth]{figs/Appendix/supp_fig_ML_spikes_OVERLAP} 
 
 }
 
@@ -605,7 +620,7 @@ In summary, ML model can be used to represent action potential responses in frog
 
 \begin{figure}
 
-{\centering \includegraphics[width=0.7\linewidth]{figs/Appendix/supp_fig_ML_ID_w_CaFR_1} 
+{\centering \includegraphics[width=0.8\linewidth]{figs/Appendix/supp_fig_ML_ID_w_CaFR_1} 
 
 }
 
@@ -620,7 +635,7 @@ In summary, ML model can be used to represent action potential responses in frog
 
 \begin{figure}
 
-{\centering \includegraphics[width=0.9\linewidth]{figs/sniff/fig_spk_sniffing_10bpm} 
+{\centering \includegraphics[width=0.95\linewidth]{figs/sniff/fig_spk_sniffing_10bpm} 
 
 }
 
@@ -629,7 +644,7 @@ In summary, ML model can be used to represent action potential responses in frog
 
 \begin{figure}
 
-{\centering \includegraphics[width=0.9\linewidth]{figs/sniff/fig_spk_sniffing_10bpm_last} 
+{\centering \includegraphics[width=0.95\linewidth]{figs/sniff/fig_spk_sniffing_10bpm_last} 
 
 }
 
@@ -638,7 +653,7 @@ In summary, ML model can be used to represent action potential responses in frog
 
 \begin{figure}
 
-{\centering \includegraphics[width=0.9\linewidth]{figs/sniff/fig_spk_sniffing_35bpm} 
+{\centering \includegraphics[width=0.95\linewidth]{figs/sniff/fig_spk_sniffing_35bpm} 
 
 }
 
@@ -647,7 +662,7 @@ In summary, ML model can be used to represent action potential responses in frog
 
 \begin{figure}
 
-{\centering \includegraphics[width=0.9\linewidth]{figs/sniff/fig_spk_sniffing_50bpm} 
+{\centering \includegraphics[width=0.95\linewidth]{figs/sniff/fig_spk_sniffing_50bpm} 
 
 }
 
@@ -931,6 +946,9 @@ In summary, ML model can be used to represent action potential responses in frog
 
 \hypertarget{refs}{}
 \begin{CSLReferences}{1}{0}
+\leavevmode\hypertarget{ref-ache05olfaction}{}%
+Ache, Barry W., and Janet M. Young. 2005. {``Olfaction: {Diverse Species}, {Conserved Principles}.''} \emph{Neuron} 48 (3): 417--30. \url{https://doi.org/10.1016/j.neuron.2005.10.022}.
+
 \leavevmode\hypertarget{ref-anderson15stochastica}{}%
 Anderson, David F., Bard Ermentrout, and Peter J. Thomas. 2015. {``Stochastic Representations of Ion Channel Kinetics and Exact Stochastic Simulation of Neuronal Dynamics.''} \emph{Journal of Computational Neuroscience} 38 (1): 67--82. \url{https://doi.org/10.1007/s10827-014-0528-2}.
 
@@ -945,6 +963,12 @@ Dougherty, Daniel P. 2005. {``{ModelDB} : {Olfactory} Receptor Neuron Model.''} 
 
 \leavevmode\hypertarget{ref-dougherty05computational}{}%
 Dougherty, Daniel P., Geraldine A. Wright, and Alice C. Yew. 2005. {``Computational Model of the {cAMP}-Mediated Sensory Response and Calcium-Dependent Adaptation in Vertebrate Olfactory Receptor Neurons.''} \emph{Proceedings of the National Academy of Sciences} 102 (30): 10415--20. \url{https://doi.org/10.1073/pnas.0504099102}.
+
+\leavevmode\hypertarget{ref-gu09computational}{}%
+Gu, Yuqiao, Philippe Lucas, and Jean-Pierre Rospars. 2009. {``Computational {Model} of the {Insect Pheromone Transduction Cascade}.''} Edited by Lyle J. Graham. \emph{PLoS Computational Biology} 5 (3): e1000321. \url{https://doi.org/10.1371/journal.pcbi.1000321}.
+
+\leavevmode\hypertarget{ref-levakova19adaptive}{}%
+Levakova, Marie, Lubomir Kostal, Christelle Monsempès, Philippe Lucas, and Ryota Kobayashi. 2019. {``Adaptive Integrate-and-Fire Model Reproduces the Dynamics of Olfactory Receptor Neuron Responses in a Moth.''} \emph{Journal of The Royal Society Interface} 16 (157): 20190246. \url{https://doi.org/10.1098/rsif.2019.0246}.
 
 \leavevmode\hypertarget{ref-reisert99adaptation}{}%
 Reisert, Johannes, and H. R. Matthews. 1999. {``Adaptation of the Odour-Induced Response in Frog Olfactory Receptor Cells.''} \emph{The Journal of Physiology} 519 (3): 801--13. \url{https://doi.org/10.1111/j.1469-7793.1999.0801n.x}.
