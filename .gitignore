@@ -1,16 +1,8 @@
 # Matlab
 *.asv
 /_local*
-*.png
-*.fig
-*.mat
-*.jpg
-*.svg
 
 # R - Report
 .Rproj.user
-*.pdf
-*.Rhistory
 **/*_cache/*
 **/*_files/*
-Report/term_paper.Rmd
